@@ -2,6 +2,8 @@ import { Client } from '@notionhq/client'
 import type {
   PageObjectResponse,
   PartialPageObjectResponse,
+  PartialDataSourceObjectResponse,
+  DataSourceObjectResponse,
 } from '@notionhq/client/build/src/api-endpoints'
 import type { Invoice, InvoiceItem, InvoiceStatus } from '@/types/invoice'
 
@@ -31,8 +33,8 @@ function getProperty(page: PageObjectResponse, name: string): any {
 
 // 견적 항목 DB에서 항목 목록 조회
 async function getInvoiceItems(invoicePageId: string): Promise<InvoiceItem[]> {
-  const response = await notion.databases.query({
-    database_id: process.env.NOTION_ITEM_DB_ID!,
+  const response = await notion.dataSources.query({
+    data_source_id: process.env.NOTION_ITEM_DB_ID!,
     filter: {
       property: '견적서(Invoice)',
       relation: {
@@ -68,13 +70,16 @@ async function getInvoiceItems(invoicePageId: string): Promise<InvoiceItem[]> {
 
 // Notion 페이지를 Invoice 타입으로 변환
 async function notionPageToInvoice(
-  page: PageObjectResponse | PartialPageObjectResponse
+  page:
+    | PageObjectResponse
+    | PartialPageObjectResponse
+    | PartialDataSourceObjectResponse
+    | DataSourceObjectResponse
 ): Promise<Invoice | null> {
   if (!('properties' in page)) return null
 
   const fullPage = page as PageObjectResponse
 
-  const slugProp = getProperty(fullPage, '공개 슬러그(Public Slug)')
   const statusProp = getProperty(fullPage, '상태(Status)')
   const invoiceNoProp = getProperty(fullPage, '견적서 번호(Invoice No)')
   const clientNameProp = getProperty(fullPage, '클라이언트명(Client Name)')
@@ -124,8 +129,8 @@ async function notionPageToInvoice(
 // 공개 슬러그로 견적서 단건 조회
 export async function getInvoiceBySlug(slug: string): Promise<Invoice | null> {
   try {
-    const response = await notion.databases.query({
-      database_id: process.env.NOTION_INVOICE_DB_ID!,
+    const response = await notion.dataSources.query({
+      data_source_id: process.env.NOTION_INVOICE_DB_ID!,
       filter: {
         property: '공개 슬러그(Public Slug)',
         rich_text: {
@@ -151,8 +156,8 @@ export async function regenerateInvoiceSlug(
 ): Promise<boolean> {
   try {
     // 기존 슬러그로 페이지 조회
-    const response = await notion.databases.query({
-      database_id: process.env.NOTION_INVOICE_DB_ID!,
+    const response = await notion.dataSources.query({
+      data_source_id: process.env.NOTION_INVOICE_DB_ID!,
       filter: {
         property: '공개 슬러그(Public Slug)',
         rich_text: {

@@ -39,3 +39,7 @@ Thumbs.db
 
 # Generated files
 next-env.d.ts
+
+# 외부 도구 (포맷 검사 제외)
+mcp-shrimp-task-manager/
+shrimp_data/
