@@ -19,8 +19,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Framework**: Next.js 15.5.3 (App Router + Turbopack)
 - **Runtime**: React 19.1.0 + TypeScript 5
 - **Styling**: TailwindCSS v4 + shadcn/ui (new-york style)
-- **Data**: Notion API (`@notionhq/client`) — 서버 사이드 전용
-- **Forms**: React Hook Form + Zod
+- **Data**: Notion API (`@notionhq/client` v5) — 서버 사이드 전용
 - **Linting**: ESLint + Prettier + Husky + lint-staged
 
 ## 명령어
@@ -73,17 +72,65 @@ ADMIN_SECRET=xxxx                   # 어드민 API 인증 토큰
 
 > **주의**: 이 변수들은 절대 `NEXT_PUBLIC_` 접두어를 사용하지 않는다. 서버 사이드 전용.
 
-### Notion DB 스키마 요약
-
-**견적서 DB**: 제목(Title), 견적서 번호(Invoice No), 클라이언트명, 클라이언트 이메일, 발행일, 유효기간, 소계, 세율, 세금(Formula), 합계(Formula), 메모, 공개 슬러그(Public Slug), 상태(Draft/Sent/Approved/Expired)
-
-**견적 항목 DB**: 항목명(Title), 설명, 수량, 단위(Select), 단가, 금액(Formula), 견적서(Relation)
-
 ### 접근 제어 규칙
 
 - 미들웨어(`src/middleware.ts`): `/invoice/*` 경로에서 slug가 UUID v4 형식이 아니면 즉시 404
 - 페이지 레벨: `status === 'Draft'` 또는 `status === 'Expired'` → `notFound()` 호출
 - 어드민 API: `x-admin-secret` 헤더로 `ADMIN_SECRET` 환경 변수와 비교 인증
+
+## 코드 작성 규칙
+
+### @notionhq/client v5 API (주의)
+
+v5에서 `databases.query()` 제거됨 → `dataSources.query()` 사용:
+
+```typescript
+// ❌ 이전 방식 (v4 이하)
+await notion.databases.query({ database_id: '...' })
+
+// ✅ 현재 방식 (v5)
+await notion.dataSources.query({ data_source_id: '...' })
+```
+
+### Next.js 15 — params는 Promise
+
+Route Handler, Page, generateMetadata 모두 `params`가 `Promise`이므로 반드시 await:
+
+```typescript
+// page.tsx / route.ts 공통 패턴
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  const { slug } = await params
+  // ...
+}
+```
+
+### Notion 필드명 규칙
+
+DB 프로퍼티 이름은 `한국어명(English Name)` 형식을 사용한다. `lib/notion.ts`의 `getProperty()` 호출 시 정확히 일치해야 함:
+
+```typescript
+getProperty(page, '공개 슬러그(Public Slug)')
+getProperty(page, '상태(Status)')
+getProperty(page, '클라이언트명(Client Name)')
+```
+
+### 인쇄(Print) CSS 클래스
+
+`globals.css`의 `@media print` 규칙:
+
+- `.no-print` — 인쇄 시 `display: none` (버튼, 헤더 등)
+- `.invoice-container` — 뷰어 본문 컨테이너 (그림자·테두리 제거)
+- `.invoice-print-container` — 인쇄 전용 A4 레이아웃
+
+### 공통 유틸리티
+
+- **클래스 병합**: `src/lib/utils.ts`의 `cn()` (`clsx` + `tailwind-merge`)
+- **shadcn/ui 컴포넌트**: `src/components/ui/` 에 로컬 복사 — `@shadcn/ui`에서 import하지 않음
+- **TailwindCSS v4**: `@import 'tailwindcss'` 방식 사용 (`@tailwind base/components/utilities` 지시어 사용 금지)
 
 ## 개발 가이드 문서
 

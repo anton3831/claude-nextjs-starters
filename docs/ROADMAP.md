@@ -109,19 +109,19 @@ Step 6. 각 단계 완료 후 중단하고 추가 지시를 기다림
 
 ---
 
-## Phase 4 — 추가 기능 🔄
+## Phase 4 — 추가 기능 ✅
 
 **목표**: PDF/인쇄 기능, 슬러그 재발급 API, 캐시 무효화 API, 다크모드 대응
 
-| #   | 작업                                          | 파일 경로                                              | 상태 | 비고                                                |
-| --- | --------------------------------------------- | ------------------------------------------------------ | ---- | --------------------------------------------------- |
-| 4.1 | `POST /api/admin/invoice/[slug]/regenerate`   | `src/app/api/admin/invoice/[slug]/regenerate/route.ts` | ✅   | `x-admin-secret` 헤더 인증                          |
-| 4.2 | `POST /api/revalidate`                        | `src/app/api/revalidate/route.ts`                      | ✅   | slug 단건 또는 전체 캐시 무효화                     |
-| 4.3 | 다크모드 대응                                 | `src/app/globals.css`                                  | ⬜   | 인쇄 시 흰 배경 처리 필요 확인                      |
-| 4.4 | `/invoice/[slug]/print/page.tsx` 인쇄 전용 뷰 | `src/app/invoice/[slug]/print/page.tsx`                | ✅   | A4 레이아웃, 헤더·버튼 제거                         |
-| 4.5 | `PrintTrigger` 클라이언트 컴포넌트            | `src/components/invoice/print-trigger.tsx`             | ✅   | `window.print()` 자동 실행, 완료 후 `router.back()` |
-| 4.6 | `PdfDownloadButton` 클라이언트 컴포넌트       | `src/components/invoice/pdf-download-button.tsx`       | ✅   | `/print` 경로로 이동                                |
-| 4.7 | `@media print` CSS 최적화                     | `src/app/globals.css`                                  | ✅   | `.no-print` 숨김, 흰 배경, 그림자 제거              |
+| #   | 작업                                          | 파일 경로                                              | 상태 | 비고                                                        |
+| --- | --------------------------------------------- | ------------------------------------------------------ | ---- | ----------------------------------------------------------- |
+| 4.1 | `POST /api/admin/invoice/[slug]/regenerate`   | `src/app/api/admin/invoice/[slug]/regenerate/route.ts` | ✅   | `x-admin-secret` 헤더 인증                                  |
+| 4.2 | `POST /api/revalidate`                        | `src/app/api/revalidate/route.ts`                      | ✅   | slug 단건 또는 전체 캐시 무효화                             |
+| 4.3 | 다크모드 대응                                 | `src/app/globals.css`                                  | ✅   | `@media print` 내 CSS 변수 재정의로 다크모드 인쇄 문제 해결 |
+| 4.4 | `/invoice/[slug]/print/page.tsx` 인쇄 전용 뷰 | `src/app/invoice/[slug]/print/page.tsx`                | ✅   | A4 레이아웃, 헤더·버튼 제거                                 |
+| 4.5 | `PrintTrigger` 클라이언트 컴포넌트            | `src/components/invoice/print-trigger.tsx`             | ✅   | `window.print()` 자동 실행, 완료 후 `router.back()`         |
+| 4.6 | `PdfDownloadButton` 클라이언트 컴포넌트       | `src/components/invoice/pdf-download-button.tsx`       | ✅   | `/print` 경로로 이동                                        |
+| 4.7 | `@media print` CSS 최적화                     | `src/app/globals.css`                                  | ✅   | `.no-print` 숨김, 흰 배경, 그림자 제거                      |
 
 ---
 
