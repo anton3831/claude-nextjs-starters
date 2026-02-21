@@ -17,6 +17,15 @@
     "shadcn": {
       "command": "npx",
       "args": ["shadcn@latest", "mcp"]
+    },
+    "shrimp-task-manager": {
+      "command": "node",
+      "args": [
+        "C:/dev/Study-08/invoice-web/mcp-shrimp-task-manager/dist/index.js"
+      ],
+      "env": {
+        "DATA_DIR": "C:/dev/Study-08/invoice-web/mcp-shrimp-task-manager/data"
+      }
     }
   }
 }
