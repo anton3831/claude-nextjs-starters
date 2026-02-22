@@ -51,6 +51,9 @@ function getProperty(page: PageObjectResponse, name: string): any {
 
 // 견적 항목 DB에서 항목 목록 조회
 async function getInvoiceItems(invoicePageId: string): Promise<InvoiceItem[]> {
+  // NOTION_ITEM_DB_ID 미설정 시 빈 배열 반환 (항목 DB 선택적)
+  if (!process.env.NOTION_ITEM_DB_ID) return []
+
   const response = await notion.dataSources.query({
     data_source_id: process.env.NOTION_ITEM_DB_ID!,
     filter: {

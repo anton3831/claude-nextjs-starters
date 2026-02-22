@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
@@ -196,7 +196,11 @@
       .relation-arrow-line {
         width: 100%;
         height: 2px;
-        background: linear-gradient(to right, var(--blue-300), var(--purple-300));
+        background: linear-gradient(
+          to right,
+          var(--blue-300),
+          var(--purple-300)
+        );
         position: relative;
       }
 
@@ -989,8 +993,8 @@
                     <code>원화</code>
                   </div>
                   <div class="field-note">
-                    항목 금액을 합산하여 수동 입력 (롤업 사용 시 Formula로
-                    대체 가능)
+                    항목 금액을 합산하여 수동 입력 (롤업 사용 시 Formula로 대체
+                    가능)
                   </div>
                 </td>
               </tr>
@@ -1133,7 +1137,9 @@
                   <span class="required-badge req-auto">⚙️ 자동</span>
                 </td>
                 <td>
-                  <div class="field-desc">레코드 자동 생성 시각 — Notion이 자동으로 기록</div>
+                  <div class="field-desc">
+                    레코드 자동 생성 시각 — Notion이 자동으로 기록
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -1145,65 +1151,46 @@
           <div class="status-section-header">
             <span>🏷</span>
             <span class="status-section-title"
-              >상태(Status) Select 옵션 — 아래 4개 옵션을 정확히 입력하세요</span
+              >상태(Status) Select 옵션 — 아래 4개 옵션을 정확히
+              입력하세요</span
             >
           </div>
           <div class="status-options">
             <div class="status-option">
               <div class="status-top">
-                <div
-                  class="status-dot"
-                  style="background: #94a3b8"
-                ></div>
+                <div class="status-dot" style="background: #94a3b8"></div>
                 <span class="status-value-ko">초안</span>
                 <span class="status-value-en">Draft</span>
               </div>
               <div class="status-desc">작성 중인 견적서</div>
-              <div class="status-access access-no">
-                🚫 고객 접근 차단
-              </div>
+              <div class="status-access access-no">🚫 고객 접근 차단</div>
             </div>
             <div class="status-option">
               <div class="status-top">
-                <div
-                  class="status-dot"
-                  style="background: #3b82f6"
-                ></div>
+                <div class="status-dot" style="background: #3b82f6"></div>
                 <span class="status-value-ko">발송</span>
                 <span class="status-value-en">Sent</span>
               </div>
               <div class="status-desc">고객에게 링크를 발송한 상태</div>
-              <div class="status-access access-yes">
-                ✅ 고객 열람 가능
-              </div>
+              <div class="status-access access-yes">✅ 고객 열람 가능</div>
             </div>
             <div class="status-option">
               <div class="status-top">
-                <div
-                  class="status-dot"
-                  style="background: #22c55e"
-                ></div>
+                <div class="status-dot" style="background: #22c55e"></div>
                 <span class="status-value-ko">승인</span>
                 <span class="status-value-en">Approved</span>
               </div>
               <div class="status-desc">고객이 견적서를 승인한 상태</div>
-              <div class="status-access access-yes">
-                ✅ 고객 열람 가능
-              </div>
+              <div class="status-access access-yes">✅ 고객 열람 가능</div>
             </div>
             <div class="status-option">
               <div class="status-top">
-                <div
-                  class="status-dot"
-                  style="background: #ef4444"
-                ></div>
+                <div class="status-dot" style="background: #ef4444"></div>
                 <span class="status-value-ko">만료</span>
                 <span class="status-value-en">Expired</span>
               </div>
               <div class="status-desc">유효기간이 지난 견적서</div>
-              <div class="status-access access-no">
-                🚫 고객 접근 차단
-              </div>
+              <div class="status-access access-no">🚫 고객 접근 차단</div>
             </div>
           </div>
         </div>
@@ -1219,8 +1206,8 @@
             <div class="db-header-tag">Database 2</div>
             <div class="db-header-title">견적 항목 (Invoice Item)</div>
             <div class="db-header-desc">
-              견적서에 포함된 개별 항목(서비스·상품)을 저장합니다. DB 1(견적서)과
-              Relation으로 연결됩니다.
+              견적서에 포함된 개별 항목(서비스·상품)을 저장합니다. DB
+              1(견적서)과 Relation으로 연결됩니다.
             </div>
             <div class="db-header-env">NOTION_ITEM_DB_ID</div>
           </div>
@@ -1252,7 +1239,9 @@
                   <div class="field-desc">
                     서비스·상품명 — Notion DB 생성 시 기본 제목 필드 사용
                   </div>
-                  <div class="field-note">예: UI 디자인, 개발 공수, 서버 호스팅</div>
+                  <div class="field-note">
+                    예: UI 디자인, 개발 공수, 서버 호스팅
+                  </div>
                 </td>
               </tr>
               <!-- 설명 -->
@@ -1300,7 +1289,9 @@
                   <span class="required-badge req-yes">✅ 필수</span>
                 </td>
                 <td>
-                  <div class="field-desc">수량의 단위 — 아래 옵션을 추가하세요</div>
+                  <div class="field-desc">
+                    수량의 단위 — 아래 옵션을 추가하세요
+                  </div>
                   <div class="unit-options">
                     <span class="unit-chip">개</span>
                     <span class="unit-chip">일</span>
@@ -1376,7 +1367,8 @@
       <section class="checklist-section">
         <h2 class="checklist-title">✅ Notion DB 생성 순서 체크리스트</h2>
         <p class="checklist-subtitle">
-          아래 순서를 따라 Notion에서 DB를 생성하세요. DB 2를 먼저 만들어야 Relation 연결이 가능합니다.
+          아래 순서를 따라 Notion에서 DB를 생성하세요. DB 2를 먼저 만들어야
+          Relation 연결이 가능합니다.
         </p>
         <div class="checklist-grid">
           <!-- DB 2 먼저 -->
@@ -1387,7 +1379,10 @@
             <div class="checklist-items">
               <div class="checklist-item">
                 <div class="checklist-checkbox"></div>
-                <span>새 Notion 페이지 → <strong>Database (Full page)</strong> 생성</span>
+                <span
+                  >새 Notion 페이지 →
+                  <strong>Database (Full page)</strong> 생성</span
+                >
               </div>
               <div class="checklist-item">
                 <div class="checklist-checkbox"></div>
@@ -1395,31 +1390,53 @@
               </div>
               <div class="checklist-item">
                 <div class="checklist-checkbox"></div>
-                <span>기본 Title 필드 이름을 <span class="checklist-field">항목명(Item Name)</span>으로 변경</span>
+                <span
+                  >기본 Title 필드 이름을
+                  <span class="checklist-field">항목명(Item Name)</span>으로
+                  변경</span
+                >
               </div>
               <div class="checklist-item">
                 <div class="checklist-checkbox"></div>
-                <span><span class="checklist-field">설명(Description)</span> — Rich Text 추가</span>
+                <span
+                  ><span class="checklist-field">설명(Description)</span> — Rich
+                  Text 추가</span
+                >
               </div>
               <div class="checklist-item">
                 <div class="checklist-checkbox"></div>
-                <span><span class="checklist-field">수량(Quantity)</span> — Number 추가</span>
+                <span
+                  ><span class="checklist-field">수량(Quantity)</span> — Number
+                  추가</span
+                >
               </div>
               <div class="checklist-item">
                 <div class="checklist-checkbox"></div>
-                <span><span class="checklist-field">단위(Unit)</span> — Select 추가 후 개/일/시간/식 옵션 입력</span>
+                <span
+                  ><span class="checklist-field">단위(Unit)</span> — Select 추가
+                  후 개/일/시간/식 옵션 입력</span
+                >
               </div>
               <div class="checklist-item">
                 <div class="checklist-checkbox"></div>
-                <span><span class="checklist-field">단가(Unit Price)</span> — Number 추가, 형식: 원화</span>
+                <span
+                  ><span class="checklist-field">단가(Unit Price)</span> —
+                  Number 추가, 형식: 원화</span
+                >
               </div>
               <div class="checklist-item">
                 <div class="checklist-checkbox"></div>
-                <span><span class="checklist-field">금액(Amount)</span> — Formula 추가 후 수식 입력</span>
+                <span
+                  ><span class="checklist-field">금액(Amount)</span> — Formula
+                  추가 후 수식 입력</span
+                >
               </div>
               <div class="checklist-item">
                 <div class="checklist-checkbox"></div>
-                <span>DB ID 복사 → <code>.env.local</code>의 <code>NOTION_ITEM_DB_ID</code>에 붙여넣기</span>
+                <span
+                  >DB ID 복사 → <code>.env.local</code>의
+                  <code>NOTION_ITEM_DB_ID</code>에 붙여넣기</span
+                >
               </div>
             </div>
           </div>
@@ -1432,7 +1449,10 @@
             <div class="checklist-items">
               <div class="checklist-item">
                 <div class="checklist-checkbox"></div>
-                <span>새 Notion 페이지 → <strong>Database (Full page)</strong> 생성</span>
+                <span
+                  >새 Notion 페이지 →
+                  <strong>Database (Full page)</strong> 생성</span
+                >
               </div>
               <div class="checklist-item">
                 <div class="checklist-checkbox"></div>
@@ -1440,71 +1460,128 @@
               </div>
               <div class="checklist-item">
                 <div class="checklist-checkbox"></div>
-                <span>기본 Title 필드 이름을 <span class="checklist-field">제목(Title)</span>으로 변경</span>
+                <span
+                  >기본 Title 필드 이름을
+                  <span class="checklist-field">제목(Title)</span>으로
+                  변경</span
+                >
               </div>
               <div class="checklist-item">
                 <div class="checklist-checkbox"></div>
-                <span><span class="checklist-field">견적서 번호(Invoice No)</span> — Rich Text 추가</span>
+                <span
+                  ><span class="checklist-field">견적서 번호(Invoice No)</span>
+                  — Rich Text 추가</span
+                >
               </div>
               <div class="checklist-item">
                 <div class="checklist-checkbox"></div>
-                <span><span class="checklist-field">클라이언트명(Client Name)</span> — Rich Text 추가</span>
+                <span
+                  ><span class="checklist-field"
+                    >클라이언트명(Client Name)</span
+                  >
+                  — Rich Text 추가</span
+                >
               </div>
               <div class="checklist-item">
                 <div class="checklist-checkbox"></div>
-                <span><span class="checklist-field">클라이언트 이메일(Client Email)</span> — Email 추가</span>
+                <span
+                  ><span class="checklist-field"
+                    >클라이언트 이메일(Client Email)</span
+                  >
+                  — Email 추가</span
+                >
               </div>
               <div class="checklist-item">
                 <div class="checklist-checkbox"></div>
-                <span><span class="checklist-field">발행일(Issue Date)</span> — Date 추가</span>
+                <span
+                  ><span class="checklist-field">발행일(Issue Date)</span> —
+                  Date 추가</span
+                >
               </div>
               <div class="checklist-item">
                 <div class="checklist-checkbox"></div>
-                <span><span class="checklist-field">유효기간(Valid Until)</span> — Date 추가</span>
+                <span
+                  ><span class="checklist-field">유효기간(Valid Until)</span> —
+                  Date 추가</span
+                >
               </div>
               <div class="checklist-item">
                 <div class="checklist-checkbox"></div>
-                <span><span class="checklist-field">항목(Items)</span> — Relation 추가 → 견적 항목 DB 선택 → 역참조 이름 <code>견적서(Invoice)</code></span>
+                <span
+                  ><span class="checklist-field">항목(Items)</span> — Relation
+                  추가 → 견적 항목 DB 선택 → 역참조 이름
+                  <code>견적서(Invoice)</code></span
+                >
               </div>
               <div class="checklist-item">
                 <div class="checklist-checkbox"></div>
-                <span><span class="checklist-field">소계(Subtotal)</span> — Number 추가, 형식: 원화</span>
+                <span
+                  ><span class="checklist-field">소계(Subtotal)</span> — Number
+                  추가, 형식: 원화</span
+                >
               </div>
               <div class="checklist-item">
                 <div class="checklist-checkbox"></div>
-                <span><span class="checklist-field">세율(Tax Rate %)</span> — Number 추가</span>
+                <span
+                  ><span class="checklist-field">세율(Tax Rate %)</span> —
+                  Number 추가</span
+                >
               </div>
               <div class="checklist-item">
                 <div class="checklist-checkbox"></div>
-                <span><span class="checklist-field">세금(Tax Amount)</span> — Formula 추가 후 수식 입력</span>
+                <span
+                  ><span class="checklist-field">세금(Tax Amount)</span> —
+                  Formula 추가 후 수식 입력</span
+                >
               </div>
               <div class="checklist-item">
                 <div class="checklist-checkbox"></div>
-                <span><span class="checklist-field">합계(Total)</span> — Formula 추가 후 수식 입력</span>
+                <span
+                  ><span class="checklist-field">합계(Total)</span> — Formula
+                  추가 후 수식 입력</span
+                >
               </div>
               <div class="checklist-item">
                 <div class="checklist-checkbox"></div>
-                <span><span class="checklist-field">메모(Notes)</span> — Rich Text 추가</span>
+                <span
+                  ><span class="checklist-field">메모(Notes)</span> — Rich Text
+                  추가</span
+                >
               </div>
               <div class="checklist-item">
                 <div class="checklist-checkbox"></div>
-                <span><span class="checklist-field">공개 슬러그(Public Slug)</span> — Rich Text 추가</span>
+                <span
+                  ><span class="checklist-field">공개 슬러그(Public Slug)</span>
+                  — Rich Text 추가</span
+                >
               </div>
               <div class="checklist-item">
                 <div class="checklist-checkbox"></div>
-                <span><span class="checklist-field">상태(Status)</span> — Select 추가 → 초안/발송/승인/만료 옵션 입력</span>
+                <span
+                  ><span class="checklist-field">상태(Status)</span> — Select
+                  추가 → 초안/발송/승인/만료 옵션 입력</span
+                >
               </div>
               <div class="checklist-item">
                 <div class="checklist-checkbox"></div>
-                <span><span class="checklist-field">담당자(Owner)</span> — Person 추가</span>
+                <span
+                  ><span class="checklist-field">담당자(Owner)</span> — Person
+                  추가</span
+                >
               </div>
               <div class="checklist-item">
                 <div class="checklist-checkbox"></div>
-                <span><span class="checklist-field">생성일(Created At)</span> — Created time 추가</span>
+                <span
+                  ><span class="checklist-field">생성일(Created At)</span> —
+                  Created time 추가</span
+                >
               </div>
               <div class="checklist-item">
                 <div class="checklist-checkbox"></div>
-                <span>DB ID 복사 → <code>.env.local</code>의 <code>NOTION_INVOICE_DB_ID</code>에 붙여넣기</span>
+                <span
+                  >DB ID 복사 → <code>.env.local</code>의
+                  <code>NOTION_INVOICE_DB_ID</code>에 붙여넣기</span
+                >
               </div>
             </div>
           </div>
@@ -1529,18 +1606,21 @@
             <code>notion.so/workspace/<strong>[DB-ID]</strong>?v=...</code>
           </li>
           <li>
-            <strong>상태(Status) 옵션 이름</strong>은 영문 코드값(<code>Draft</code>,
-            <code>Sent</code>, <code>Approved</code>, <code>Expired</code>)과
-            한국어(<code>초안</code>, <code>발송</code>, <code>승인</code>, <code>만료</code>)
-            중 코드에서 <code>statusProp?.select?.name</code>으로 읽어오므로,
-            실제 Select 옵션에 입력한 텍스트 그대로 비교됩니다.
-            현재 코드는 <strong>영문 이름</strong>으로 비교하므로 옵션을 영문(<code>Draft</code> 등)으로 입력하거나
-            코드를 한국어에 맞게 수정하세요.
+            <strong>상태(Status) 옵션 이름</strong>은 영문
+            코드값(<code>Draft</code>, <code>Sent</code>, <code>Approved</code>,
+            <code>Expired</code>)과 한국어(<code>초안</code>, <code>발송</code>,
+            <code>승인</code>, <code>만료</code>) 중 코드에서
+            <code>statusProp?.select?.name</code>으로 읽어오므로, 실제 Select
+            옵션에 입력한 텍스트 그대로 비교됩니다. 현재 코드는
+            <strong>영문 이름</strong>으로 비교하므로 옵션을 영문(<code
+              >Draft</code
+            >
+            등)으로 입력하거나 코드를 한국어에 맞게 수정하세요.
           </li>
           <li>
-            <code>NOTION_API_KEY</code>는 Notion Integration에서 발급하며,
-            해당 Integration을 두 DB 모두에 <strong>공유(Share)</strong>해야
-            데이터 조회가 가능합니다.
+            <code>NOTION_API_KEY</code>는 Notion Integration에서 발급하며, 해당
+            Integration을 두 DB 모두에 <strong>공유(Share)</strong>해야 데이터
+            조회가 가능합니다.
           </li>
         </ul>
       </div>

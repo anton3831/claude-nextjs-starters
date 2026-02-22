@@ -1,6 +1,6 @@
 # 견적서 웹 뷰어 — 개발 로드맵
 
-> **버전**: 0.3.1 | **최종 업데이트**: 2026-02-22 | **기반 문서**: PRD v0.1.0
+> **버전**: 0.3.2 | **최종 업데이트**: 2026-02-23 | **기반 문서**: PRD v0.1.0
 >
 > 상태 표기: ✅ 완료 | 🔄 진행 중 | ⬜ 미완료
 
@@ -131,8 +131,8 @@ Step 6. 각 단계 완료 후 중단하고 추가 지시를 기다림
 
 | #   | 작업                                                      | 파일 경로           | 상태 | 비고                                                                                                                          |
 | --- | --------------------------------------------------------- | ------------------- | ---- | ----------------------------------------------------------------------------------------------------------------------------- |
-| 5.1 | Notion DB 스키마 설계 및 샘플 데이터 입력                 | Notion 워크스페이스 | ⬜   | 견적서 3건 이상, `docs/env-variables.md` 참고                                                                                 |
-| 5.2 | 환경 변수 설정                                            | `.env.local`        | ⬜   | `NOTION_API_KEY`, `NOTION_INVOICE_DB_ID`, `NOTION_ITEM_DB_ID`, `ADMIN_SECRET` / `.env.example` 예시 파일 생성 필요            |
+| 5.1 | Notion DB 스키마 설계 및 샘플 데이터 입력                 | Notion 워크스페이스 | ✅   | 샘플 4건 (Sent/Draft/Expired + 기존 1건), `scripts/seed-notion.ts`로 생성                                                     |
+| 5.2 | 환경 변수 설정                                            | `.env.local`        | ✅   | `update-env-ids.ts`로 data_source_id 자동 업데이트, ADMIN_SECRET 자동 생성, `.env.example` 생성                               |
 | 5.3 | Vercel 배포 및 환경 변수 설정                             | Vercel 대시보드     | ⬜   | `NOTION_*`, `ADMIN_SECRET` 환경 변수 등록                                                                                     |
 | 5.4 | **[테스트]** API 엔드포인트 Playwright MCP 검증           | —                   | ⬜   | `GET /api/invoice/[slug]` 정상·404·만료 케이스, `POST /api/admin/…/regenerate` 인증·슬러그 재발급, `POST /api/revalidate` E2E |
 | 5.5 | **[테스트]** 뷰어 UI Playwright MCP E2E 테스트            | —                   | ⬜   | 견적서 조회·렌더링·상태 분기(Draft/Expired/미존재) E2E 검증, 반응형 레이아웃 확인                                             |

@@ -9,7 +9,7 @@ const envSchema = z.object({
   // Notion API 설정 (서버 사이드 전용 — NEXT_PUBLIC_ 접두어 절대 사용 금지)
   NOTION_API_KEY: z.string().min(1, 'NOTION_API_KEY is required'),
   NOTION_INVOICE_DB_ID: z.string().min(1, 'NOTION_INVOICE_DB_ID is required'),
-  NOTION_ITEM_DB_ID: z.string().min(1, 'NOTION_ITEM_DB_ID is required'),
+  NOTION_ITEM_DB_ID: z.string().optional().default(''),
   // 어드민 API 인증 토큰
   ADMIN_SECRET: z.string().min(1, 'ADMIN_SECRET is required'),
 })
