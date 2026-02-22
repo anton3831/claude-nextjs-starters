@@ -1,0 +1,161 @@
+{
+  "tasks": [
+    {
+      "id": "8e257742-1921-4604-9766-b36378e37257",
+      "name": "1.1 패키지 설치 확인 — @notionhq/client, uuid, @types/uuid",
+      "description": "package.json에 @notionhq/client v5.9.0, uuid v13.0.0, @types/uuid v10.0.0이 올바르게 설치되어 있는지 확인한다.\n\n검증 기준:\n- @notionhq/client ^5.9.0 (dependencies)\n- uuid ^13.0.0 (dependencies)\n- @types/uuid ^10.0.0 (devDependencies)",
+      "notes": "현재 package.json에 모두 존재함. 신규 설치 불필요.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-02-21T11:58:43.331Z",
+      "updatedAt": "2026-02-21T11:59:07.452Z",
+      "relatedFiles": [
+        {
+          "path": "package.json",
+          "type": "REFERENCE",
+          "description": "패키지 의존성 파일"
+        }
+      ],
+      "implementationGuide": "package.json 읽기 → 세 패키지 버전 확인 → 이미 설치 완료 상태이므로 추가 작업 없음",
+      "verificationCriteria": "package.json의 dependencies에 @notionhq/client, uuid가 있고 devDependencies에 @types/uuid가 있으면 통과",
+      "analysisResult": "Phase 1 — 골격 구축: 4개 작업 모두 완전 구현 확인됨. package.json (@notionhq/client v5.9.0, uuid v13, @types/uuid v10), src/types/invoice.ts (Invoice/InvoiceItem/InvoiceStatus), src/lib/env.ts (Zod v4 스키마), src/middleware.ts (UUID v4 정규식 + /invoice/* matcher) 모두 PRD 명세와 CLAUDE.md 규칙을 준수함.",
+      "summary": "package.json 확인 완료. @notionhq/client ^5.9.0 (dependencies), uuid ^13.0.0 (dependencies), @types/uuid ^10.0.0 (devDependencies) 모두 정확히 설치되어 있음. 요구사항 100% 충족.",
+      "completedAt": "2026-02-21T11:59:07.446Z"
+    },
+    {
+      "id": "08e8e4a8-dfb8-419d-97f2-94914b8b176e",
+      "name": "1.2 응답 타입 정의 — src/types/invoice.ts",
+      "description": "견적서 도메인 타입을 정의한다. PRD v0.1.0 명세 기준:\n- InvoiceStatus: 'Draft' | 'Sent' | 'Approved' | 'Expired'\n- InvoiceItem: id, name, description, quantity, unit, unitPrice, amount\n- Invoice: id, title, invoiceNo, clientName, clientEmail?, issueDate, validUntil, items, subtotal, taxRate, taxAmount, total, notes?, status\n- InvoiceResponse: { data: Invoice }\n- InvoiceErrorResponse: { error: string }",
+      "notes": "현재 구현에 title 필드가 추가되어 있음 (PRD에 없지만 Notion Title 속성 매핑에 필요). 정상 범위.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-02-21T11:58:43.331Z",
+      "updatedAt": "2026-02-21T11:59:21.700Z",
+      "relatedFiles": [
+        {
+          "path": "src/types/invoice.ts",
+          "type": "REFERENCE",
+          "description": "견적서 도메인 타입 정의"
+        }
+      ],
+      "implementationGuide": "src/types/invoice.ts 읽기 → PRD 명세와 비교 → 이미 완전 구현 확인 → 추가 작업 없음",
+      "verificationCriteria": "InvoiceStatus, InvoiceItem, Invoice, InvoiceResponse, InvoiceErrorResponse 5개 타입이 모두 export되어 있고, Invoice.status가 InvoiceStatus 타입을 사용하면 통과",
+      "analysisResult": "Phase 1 — 골격 구축: 4개 작업 모두 완전 구현 확인됨. package.json (@notionhq/client v5.9.0, uuid v13, @types/uuid v10), src/types/invoice.ts (Invoice/InvoiceItem/InvoiceStatus), src/lib/env.ts (Zod v4 스키마), src/middleware.ts (UUID v4 정규식 + /invoice/* matcher) 모두 PRD 명세와 CLAUDE.md 규칙을 준수함.",
+      "summary": "src/types/invoice.ts 확인 완료. InvoiceStatus, InvoiceItem, Invoice, InvoiceResponse, InvoiceErrorResponse 5개 타입 모두 export됨. Invoice.status는 InvoiceStatus 타입 사용. PRD 명세의 모든 필드 포함 + title 필드 추가(Notion Title 속성 매핑용). 요구사항 100% 충족.",
+      "completedAt": "2026-02-21T11:59:21.690Z"
+    },
+    {
+      "id": "0d913372-d80d-4b44-b0a0-603a41998f48",
+      "name": "1.3 환경 변수 스키마 — src/lib/env.ts",
+      "description": "Zod를 사용해 서버 환경변수를 검증하는 스키마를 정의한다.\n\n포함 변수:\n- NOTION_API_KEY: string (필수)\n- NOTION_INVOICE_DB_ID: string (필수)\n- NOTION_ITEM_DB_ID: string (필수)\n- ADMIN_SECRET: string (필수)\n\n규칙: NEXT_PUBLIC_ 접두어 절대 사용 금지 (위 4개에 대해)",
+      "notes": "NEXT_PUBLIC_APP_URL은 앱 URL 노출이 의도적이므로 허용 범위. Notion 관련 4개 변수는 NEXT_PUBLIC_ 없음 확인 완료.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-02-21T11:58:43.331Z",
+      "updatedAt": "2026-02-21T11:59:35.761Z",
+      "relatedFiles": [
+        {
+          "path": "src/lib/env.ts",
+          "type": "REFERENCE",
+          "description": "Zod 환경변수 검증 스키마"
+        }
+      ],
+      "implementationGuide": "src/lib/env.ts 읽기 → Zod 스키마 검증 → 이미 완전 구현 확인 → 추가 작업 없음",
+      "verificationCriteria": "env.ts가 Zod를 사용해 NOTION_API_KEY, NOTION_INVOICE_DB_ID, NOTION_ITEM_DB_ID, ADMIN_SECRET를 필수값으로 검증하고, 위 변수들에 NEXT_PUBLIC_ 접두어가 없으면 통과",
+      "analysisResult": "Phase 1 — 골격 구축: 4개 작업 모두 완전 구현 확인됨. package.json (@notionhq/client v5.9.0, uuid v13, @types/uuid v10), src/types/invoice.ts (Invoice/InvoiceItem/InvoiceStatus), src/lib/env.ts (Zod v4 스키마), src/middleware.ts (UUID v4 정규식 + /invoice/* matcher) 모두 PRD 명세와 CLAUDE.md 규칙을 준수함.",
+      "summary": "src/lib/env.ts 확인 완료. Zod 스키마로 NOTION_API_KEY, NOTION_INVOICE_DB_ID, NOTION_ITEM_DB_ID, ADMIN_SECRET 4개 변수를 필수값으로 검증. 해당 변수들에 NEXT_PUBLIC_ 접두어 없음. envSchema.parse()로 서버 시작 시 즉시 검증. 요구사항 100% 충족.",
+      "completedAt": "2026-02-21T11:59:35.751Z"
+    },
+    {
+      "id": "671a4d5a-a575-4129-990e-5a61f820ae34",
+      "name": "1.4 UUID 형식 검증 미들웨어 — src/middleware.ts",
+      "description": "/invoice/* 경로 진입 시 slug가 UUID v4 형식인지 검증하는 Next.js 미들웨어를 구현한다.\n\n요구사항:\n- UUID v4 정규식: /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i\n- matcher: ['/invoice/:path*']\n- 비정상 slug → 404 처리\n- /invoice/[slug]/print 경로도 처리",
+      "notes": "NextResponse.rewrite('/not-found') 방식 사용 중. Next.js 미들웨어에서 notFound()를 직접 호출할 수 없으므로 rewrite 방식은 올바른 패턴임.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-02-21T11:58:43.331Z",
+      "updatedAt": "2026-02-21T11:59:48.476Z",
+      "relatedFiles": [
+        {
+          "path": "src/middleware.ts",
+          "type": "REFERENCE",
+          "description": "UUID 형식 검증 미들웨어"
+        }
+      ],
+      "implementationGuide": "src/middleware.ts 읽기 → UUID 정규식, matcher, 비정상 slug 처리 확인 → 이미 완전 구현 확인 → 추가 작업 없음",
+      "verificationCriteria": "UUID v4 정규식이 정확히 적용되고, matcher에 '/invoice/:path*'가 포함되며, 비정상 slug 접근 시 404 또는 not-found 응답이 반환되면 통과",
+      "analysisResult": "Phase 1 — 골격 구축: 4개 작업 모두 완전 구현 확인됨. package.json (@notionhq/client v5.9.0, uuid v13, @types/uuid v10), src/types/invoice.ts (Invoice/InvoiceItem/InvoiceStatus), src/lib/env.ts (Zod v4 스키마), src/middleware.ts (UUID v4 정규식 + /invoice/* matcher) 모두 PRD 명세와 CLAUDE.md 규칙을 준수함.",
+      "summary": "src/middleware.ts 확인 완료. UUID v4 정규식 /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i 정확히 적용. matcher: ['/invoice/:path*'] 설정. /invoice/[slug]/print 경로도 정규식으로 처리. 비정상 slug → NextResponse.rewrite('/not-found')로 404 처리. 요구사항 100% 충족.",
+      "completedAt": "2026-02-21T11:59:48.466Z"
+    },
+    {
+      "id": "d694101b-88c7-41a4-8703-241a466f3216",
+      "name": "Draft/Expired 케이스별 에러 화면 분기 구현",
+      "description": "현재 page.tsx는 Draft/Expired/null 모두 notFound()로 처리해 단일 메시지만 표시됨. 케이스별 다른 메시지를 보여주도록 수정.\n\n구현 방식:\n- null (DB에 없음) → 기존 notFound() 유지 (not-found.tsx 표시)\n- status === 'Draft' → page.tsx에서 직접 에러 화면 렌더링 (아직 발송되지 않은 견적서)\n- status === 'Expired' → page.tsx에서 직접 에러 화면 렌더링 (만료된 견적서)\n\n적용 파일:\n- src/app/invoice/[slug]/page.tsx: Draft/Expired 분기 추가\n- generateMetadata도 동일한 분기 유지\n\n에러 화면 디자인:\n- 기존 not-found.tsx와 동일한 스타일 (FileX 아이콘, shadcn/ui Button)\n- Draft 메시지: '아직 발송되지 않은 견적서입니다'\n- Expired 메시지: '유효기간이 만료된 견적서입니다'",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-02-22T09:36:32.572Z",
+      "updatedAt": "2026-02-22T09:37:21.028Z",
+      "relatedFiles": [
+        {
+          "path": "src/app/invoice/[slug]/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "Draft/Expired 케이스별 에러 화면 렌더링"
+        },
+        {
+          "path": "src/app/invoice/[slug]/not-found.tsx",
+          "type": "REFERENCE",
+          "description": "에러 화면 디자인 참조"
+        }
+      ],
+      "implementationGuide": "1. page.tsx에서 invoice가 null이면 notFound() 호출\n2. invoice.status === 'Draft'이면 Draft 에러 화면 JSX 반환\n3. invoice.status === 'Expired'이면 Expired 에러 화면 JSX 반환\n4. 에러 화면은 not-found.tsx와 동일한 레이아웃 사용\n5. 아이콘: Draft는 Clock, Expired는 CalendarX (lucide-react)\n6. generateMetadata도 동일한 분기 적용",
+      "verificationCriteria": "- Draft 상태 견적서 접근 시 '아직 발송되지 않은 견적서' 메시지 표시\n- Expired 상태 견적서 접근 시 '유효기간이 만료된 견적서' 메시지 표시\n- null(미존재) 접근 시 기존 not-found.tsx 화면 표시\n- TypeScript 타입 오류 없음 (npx tsc --noEmit --skipLibCheck)",
+      "analysisResult": "Phase 5 배포 및 테스트 준비 단계. 현재 Phase 1~4 구현 완료. not-found 케이스별 분기와 setup-notion.ts v5 호환성 수정이 코드 작업으로 가능하며, 환경변수 설정은 사용자 수동 작업 필요.",
+      "summary": "page.tsx에서 Draft/Expired/null 케이스 분기 구현 완료. null → notFound(), Draft → Clock 아이콘 + '아직 발송되지 않은 견적서' 메시지, Expired → CalendarX 아이콘 + '유효기간이 만료된 견적서' 메시지. generateMetadata도 동일 분기 적용. TypeScript 타입 오류 없음.",
+      "completedAt": "2026-02-22T09:37:21.021Z"
+    },
+    {
+      "id": "ad4b82f8-fa99-4973-bd71-10e7966aac96",
+      "name": "scripts/setup-notion.ts @notionhq/client v5 호환성 수정",
+      "description": "setup-notion.ts에서 notion.databases.create()와 notion.databases.update() 호출 시 TypeScript 타입 오류 발생. @notionhq/client v5 타입 정의와 파라미터 구조가 맞지 않음.\n\n오류 위치:\n- line 85: notion.databases.create() - properties 타입 불일치\n- line 140: notion.databases.create() - properties 타입 불일치\n- line 183: notion.databases.update() - properties 타입 불일치\n\n수정 방법: eslint-disable-next-line 주석으로 타입 체크 우회 또는 as unknown as any 타입 단언 사용. 이 파일은 src/ 디렉토리 외부의 유틸 스크립트이므로 프로덕션 번들에 영향 없음.",
+      "status": "pending",
+      "dependencies": [],
+      "createdAt": "2026-02-22T09:36:32.573Z",
+      "updatedAt": "2026-02-22T09:36:32.573Z",
+      "relatedFiles": [
+        {
+          "path": "scripts/setup-notion.ts",
+          "type": "TO_MODIFY",
+          "description": "v5 타입 호환성 수정"
+        }
+      ],
+      "implementationGuide": "1. 각 databases.create() 및 databases.update() 호출부에 타입 단언 추가\n2. properties 객체에 as unknown 타입 단언 적용\n3. 파일 상단에 eslint-disable 주석 추가 (any 사용 허용)\n4. 수정 후 npx tsc --noEmit --skipLibCheck로 src/ 오류 없음 확인",
+      "verificationCriteria": "- npx tsc --noEmit --skipLibCheck 실행 시 src/ 디렉토리 오류 없음\n- scripts/setup-notion.ts 타입 오류 해소 또는 명시적 eslint-disable 처리",
+      "analysisResult": "Phase 5 배포 및 테스트 준비 단계. 현재 Phase 1~4 구현 완료. not-found 케이스별 분기와 setup-notion.ts v5 호환성 수정이 코드 작업으로 가능하며, 환경변수 설정은 사용자 수동 작업 필요."
+    },
+    {
+      "id": "d3f06a73-6779-4aca-b5de-2dbc7ac553eb",
+      "name": ".env.local 설정 가이드 및 예시 파일 생성",
+      "description": ".env.example 파일 생성으로 환경변수 설정 가이드 제공. 사용자가 .env.local을 수동으로 구성할 수 있도록 명확한 예시와 설명 포함.\n\n포함 변수:\n- NOTION_API_KEY: Notion Integration 시크릿\n- NOTION_INVOICE_DB_ID: 견적서 DB ID\n- NOTION_ITEM_DB_ID: 견적 항목 DB ID\n- ADMIN_SECRET: 어드민 API 인증 토큰\n\n주의: .env.example은 실제 값 없이 형식만 표시, .gitignore에 .env.local이 포함되어 있는지 확인",
+      "status": "pending",
+      "dependencies": [],
+      "createdAt": "2026-02-22T09:36:32.573Z",
+      "updatedAt": "2026-02-22T09:36:32.573Z",
+      "relatedFiles": [
+        {
+          "path": ".env.example",
+          "type": "CREATE",
+          "description": "환경변수 예시 파일"
+        },
+        {
+          "path": ".gitignore",
+          "type": "REFERENCE",
+          "description": ".env.local 제외 여부 확인"
+        }
+      ],
+      "implementationGuide": "1. .env.example 파일 존재 여부 확인 (Glob 사용)\n2. 없으면 .env.example 생성 (실제 값 없이 형식만)\n3. .gitignore에 .env.local 제외 여부 확인\n4. README나 docs에 설정 방법 안내 (필요 시)",
+      "verificationCriteria": "- .env.example 파일 존재\n- 4개 환경변수 모두 포함 (실제 값 없이)\n- .gitignore에 .env.local 포함 확인",
+      "analysisResult": "Phase 5 배포 및 테스트 준비 단계. 현재 Phase 1~4 구현 완료. not-found 케이스별 분기와 setup-notion.ts v5 호환성 수정이 코드 작업으로 가능하며, 환경변수 설정은 사용자 수동 작업 필요."
+    }
+  ]
+}

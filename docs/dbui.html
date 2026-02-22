@@ -1,0 +1,1554 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoice Web Viewer — Notion DB 스키마</title>
+    <style>
+      /* ── 리셋 & 기본 ── */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+
+        --blue-50: #eff6ff;
+        --blue-100: #dbeafe;
+        --blue-200: #bfdbfe;
+        --blue-500: #3b82f6;
+        --blue-600: #2563eb;
+        --blue-700: #1d4ed8;
+
+        --purple-50: #faf5ff;
+        --purple-100: #f3e8ff;
+        --purple-200: #e9d5ff;
+        --purple-500: #a855f7;
+        --purple-600: #9333ea;
+        --purple-700: #7e22ce;
+
+        --green-50: #f0fdf4;
+        --green-100: #dcfce7;
+        --green-500: #22c55e;
+        --green-600: #16a34a;
+        --green-700: #15803d;
+
+        --amber-50: #fffbeb;
+        --amber-100: #fef3c7;
+        --amber-500: #f59e0b;
+        --amber-600: #d97706;
+
+        --red-50: #fef2f2;
+        --red-100: #fee2e2;
+        --red-500: #ef4444;
+        --red-600: #dc2626;
+
+        --orange-50: #fff7ed;
+        --orange-100: #ffedd5;
+        --orange-500: #f97316;
+
+        --teal-50: #f0fdfa;
+        --teal-100: #ccfbf1;
+        --teal-500: #14b8a6;
+        --teal-600: #0d9488;
+
+        --font: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+        --radius: 10px;
+        --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+      }
+
+      body {
+        font-family: var(--font);
+        background: var(--gray-50);
+        color: var(--gray-800);
+        line-height: 1.6;
+        min-height: 100vh;
+      }
+
+      /* ── 레이아웃 ── */
+      .page {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 48px 24px 80px;
+      }
+
+      /* ── 헤더 ── */
+      .page-header {
+        text-align: center;
+        margin-bottom: 56px;
+      }
+
+      .page-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--blue-50);
+        color: var(--blue-600);
+        border: 1px solid var(--blue-200);
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 4px 14px;
+        margin-bottom: 20px;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      .page-title {
+        font-size: 32px;
+        font-weight: 800;
+        color: var(--gray-900);
+        letter-spacing: -0.5px;
+        margin-bottom: 12px;
+      }
+
+      .page-subtitle {
+        font-size: 15px;
+        color: var(--gray-500);
+        max-width: 520px;
+        margin: 0 auto;
+      }
+
+      /* ── 관계 다이어그램 ── */
+      .relation-diagram {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
+        margin-bottom: 56px;
+      }
+
+      .relation-box {
+        background: #fff;
+        border: 2px solid var(--gray-200);
+        border-radius: var(--radius);
+        padding: 18px 28px;
+        text-align: center;
+        box-shadow: var(--shadow-sm);
+        min-width: 180px;
+      }
+
+      .relation-box.db-invoice {
+        border-color: var(--blue-300);
+        background: var(--blue-50);
+      }
+
+      .relation-box.db-item {
+        border-color: var(--purple-300);
+        background: var(--purple-50);
+      }
+
+      .relation-box-icon {
+        font-size: 28px;
+        margin-bottom: 6px;
+      }
+
+      .relation-box-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--gray-400);
+        margin-bottom: 4px;
+      }
+
+      .relation-box-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--gray-800);
+      }
+
+      .relation-box-env {
+        font-size: 11px;
+        color: var(--gray-400);
+        margin-top: 6px;
+        font-family: 'SF Mono', 'Fira Code', monospace;
+        background: var(--gray-100);
+        border-radius: 4px;
+        padding: 2px 6px;
+        display: inline-block;
+      }
+
+      .relation-arrow {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        padding: 0 16px;
+        min-width: 160px;
+      }
+
+      .relation-arrow-line {
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(to right, var(--blue-300), var(--purple-300));
+        position: relative;
+      }
+
+      .relation-arrow-line::after {
+        content: '';
+        position: absolute;
+        right: -1px;
+        top: -5px;
+        border: 6px solid transparent;
+        border-left-color: var(--purple-400);
+      }
+
+      .relation-arrow-label {
+        font-size: 11px;
+        color: var(--gray-500);
+        font-weight: 500;
+        text-align: center;
+      }
+
+      .relation-arrow-field {
+        font-size: 10px;
+        color: var(--gray-400);
+        font-family: 'SF Mono', 'Fira Code', monospace;
+        background: var(--gray-100);
+        border-radius: 4px;
+        padding: 1px 6px;
+      }
+
+      /* ── DB 섹션 ── */
+      .db-section {
+        margin-bottom: 48px;
+      }
+
+      .db-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 20px;
+        padding: 20px 24px;
+        border-radius: var(--radius);
+        border-left: 5px solid;
+      }
+
+      .db-header.invoice {
+        background: linear-gradient(135deg, var(--blue-50), #fff);
+        border-left-color: var(--blue-500);
+      }
+
+      .db-header.item {
+        background: linear-gradient(135deg, var(--purple-50), #fff);
+        border-left-color: var(--purple-500);
+      }
+
+      .db-header-icon {
+        font-size: 36px;
+        flex-shrink: 0;
+        line-height: 1;
+        margin-top: 2px;
+      }
+
+      .db-header-content {
+        flex: 1;
+      }
+
+      .db-header-tag {
+        display: inline-block;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        padding: 2px 8px;
+        border-radius: 4px;
+        margin-bottom: 6px;
+      }
+
+      .invoice .db-header-tag {
+        background: var(--blue-100);
+        color: var(--blue-700);
+      }
+
+      .item .db-header-tag {
+        background: var(--purple-100);
+        color: var(--purple-700);
+      }
+
+      .db-header-title {
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--gray-900);
+        margin-bottom: 4px;
+      }
+
+      .db-header-desc {
+        font-size: 13px;
+        color: var(--gray-500);
+      }
+
+      .db-header-env {
+        display: inline-block;
+        font-family: 'SF Mono', 'Fira Code', monospace;
+        font-size: 12px;
+        background: var(--gray-800);
+        color: #a5f3fc;
+        border-radius: 6px;
+        padding: 4px 12px;
+        margin-top: 8px;
+        letter-spacing: 0.03em;
+      }
+
+      /* ── 테이블 ── */
+      .table-wrap {
+        background: #fff;
+        border-radius: var(--radius);
+        border: 1px solid var(--gray-200);
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13.5px;
+      }
+
+      thead {
+        background: var(--gray-50);
+        border-bottom: 2px solid var(--gray-200);
+      }
+
+      thead th {
+        padding: 12px 16px;
+        text-align: left;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: var(--gray-500);
+        white-space: nowrap;
+      }
+
+      tbody tr {
+        border-bottom: 1px solid var(--gray-100);
+        transition: background 0.1s;
+      }
+
+      tbody tr:last-child {
+        border-bottom: none;
+      }
+
+      tbody tr:hover {
+        background: var(--gray-50);
+      }
+
+      td {
+        padding: 13px 16px;
+        vertical-align: middle;
+      }
+
+      /* ── 필드명 ── */
+      .field-name {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .field-notion {
+        font-family: 'SF Mono', 'Fira Code', monospace;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--gray-800);
+        background: var(--gray-100);
+        border-radius: 5px;
+        padding: 3px 8px;
+        display: inline-block;
+        white-space: nowrap;
+      }
+
+      /* ── 타입 뱃지 ── */
+      .type-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+        border: 1px solid transparent;
+      }
+
+      .type-title {
+        background: var(--blue-50);
+        color: var(--blue-700);
+        border-color: var(--blue-200);
+      }
+      .type-rich-text {
+        background: var(--gray-100);
+        color: var(--gray-700);
+        border-color: var(--gray-200);
+      }
+      .type-email {
+        background: var(--teal-50);
+        color: var(--teal-600);
+        border-color: var(--teal-100);
+      }
+      .type-date {
+        background: var(--amber-50);
+        color: var(--amber-600);
+        border-color: var(--amber-100);
+      }
+      .type-relation {
+        background: var(--purple-50);
+        color: var(--purple-700);
+        border-color: var(--purple-200);
+      }
+      .type-number {
+        background: var(--green-50);
+        color: var(--green-700);
+        border-color: var(--green-100);
+      }
+      .type-formula {
+        background: var(--orange-50);
+        color: var(--orange-500);
+        border-color: var(--orange-100);
+      }
+      .type-select {
+        background: var(--red-50);
+        color: var(--red-600);
+        border-color: var(--red-100);
+      }
+      .type-person {
+        background: #fdf4ff;
+        color: #a21caf;
+        border-color: #f0abfc;
+      }
+      .type-created-time {
+        background: var(--gray-50);
+        color: var(--gray-500);
+        border-color: var(--gray-200);
+      }
+
+      /* ── 필수 뱃지 ── */
+      .required-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 11.5px;
+        font-weight: 600;
+        border-radius: 5px;
+        padding: 3px 8px;
+        white-space: nowrap;
+      }
+
+      .req-yes {
+        background: var(--green-50);
+        color: var(--green-700);
+        border: 1px solid var(--green-100);
+      }
+
+      .req-no {
+        background: var(--gray-50);
+        color: var(--gray-400);
+        border: 1px solid var(--gray-200);
+      }
+
+      .req-auto {
+        background: var(--orange-50);
+        color: var(--orange-500);
+        border: 1px solid var(--orange-100);
+      }
+
+      /* ── 설명 ── */
+      .field-desc {
+        font-size: 13px;
+        color: var(--gray-600);
+        line-height: 1.5;
+      }
+
+      .field-note {
+        font-size: 11.5px;
+        color: var(--gray-400);
+        margin-top: 3px;
+      }
+
+      .field-formula {
+        font-family: 'SF Mono', 'Fira Code', monospace;
+        font-size: 11.5px;
+        background: var(--orange-50);
+        color: var(--orange-500);
+        border-radius: 4px;
+        padding: 2px 6px;
+        display: inline-block;
+        margin-top: 3px;
+      }
+
+      /* ── 상태 옵션 ── */
+      .status-section {
+        margin-top: 20px;
+        background: #fff;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .status-section-header {
+        padding: 14px 20px;
+        background: var(--gray-50);
+        border-bottom: 1px solid var(--gray-200);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .status-section-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--gray-700);
+      }
+
+      .status-options {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 0;
+      }
+
+      .status-option {
+        padding: 16px 20px;
+        border-right: 1px solid var(--gray-100);
+        border-bottom: 1px solid var(--gray-100);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .status-option:last-child,
+      .status-option:nth-child(4n) {
+        border-right: none;
+      }
+
+      .status-top {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .status-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+
+      .status-value-ko {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--gray-800);
+      }
+
+      .status-value-en {
+        font-family: 'SF Mono', 'Fira Code', monospace;
+        font-size: 11px;
+        color: var(--gray-400);
+        background: var(--gray-100);
+        border-radius: 4px;
+        padding: 1px 5px;
+      }
+
+      .status-desc {
+        font-size: 12px;
+        color: var(--gray-500);
+      }
+
+      .status-access {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        font-size: 11px;
+        font-weight: 600;
+        border-radius: 4px;
+        padding: 2px 7px;
+        width: fit-content;
+      }
+
+      .access-yes {
+        background: var(--green-50);
+        color: var(--green-600);
+      }
+
+      .access-no {
+        background: var(--red-50);
+        color: var(--red-500);
+      }
+
+      /* ── 단위 옵션 ── */
+      .unit-options {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-top: 4px;
+      }
+
+      .unit-chip {
+        font-size: 12px;
+        background: var(--purple-50);
+        color: var(--purple-700);
+        border: 1px solid var(--purple-200);
+        border-radius: 5px;
+        padding: 2px 9px;
+        font-weight: 600;
+      }
+
+      /* ── 체크리스트 ── */
+      .checklist-section {
+        margin-top: 56px;
+      }
+
+      .checklist-title {
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--gray-900);
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .checklist-subtitle {
+        font-size: 13px;
+        color: var(--gray-500);
+        margin-bottom: 20px;
+      }
+
+      .checklist-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+
+      @media (max-width: 680px) {
+        .checklist-grid {
+          grid-template-columns: 1fr;
+        }
+        .relation-diagram {
+          flex-direction: column;
+        }
+        .relation-arrow {
+          transform: rotate(90deg);
+          padding: 8px 0;
+        }
+        .status-options {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      .checklist-card {
+        background: #fff;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .checklist-card-header {
+        padding: 14px 18px;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--gray-700);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border-bottom: 1px solid var(--gray-100);
+      }
+
+      .checklist-card.invoice .checklist-card-header {
+        background: var(--blue-50);
+      }
+
+      .checklist-card.item .checklist-card-header {
+        background: var(--purple-50);
+      }
+
+      .checklist-items {
+        padding: 14px 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .checklist-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        font-size: 13px;
+        color: var(--gray-700);
+      }
+
+      .checklist-checkbox {
+        width: 18px;
+        height: 18px;
+        border: 2px solid var(--gray-300);
+        border-radius: 4px;
+        flex-shrink: 0;
+        margin-top: 1px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+      }
+
+      .checklist-field {
+        font-family: 'SF Mono', 'Fira Code', monospace;
+        font-size: 11.5px;
+        background: var(--gray-100);
+        border-radius: 4px;
+        padding: 1px 5px;
+        color: var(--gray-600);
+      }
+
+      /* ── 구분선 ── */
+      .divider {
+        height: 1px;
+        background: var(--gray-200);
+        margin: 40px 0;
+      }
+
+      /* ── 주의사항 ── */
+      .notice-box {
+        background: var(--amber-50);
+        border: 1px solid var(--amber-100);
+        border-left: 4px solid var(--amber-500);
+        border-radius: var(--radius);
+        padding: 16px 20px;
+        margin-top: 48px;
+      }
+
+      .notice-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--amber-600);
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .notice-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      .notice-list li {
+        font-size: 13px;
+        color: var(--gray-700);
+        padding-left: 16px;
+        position: relative;
+      }
+
+      .notice-list li::before {
+        content: '·';
+        position: absolute;
+        left: 4px;
+        color: var(--amber-500);
+        font-weight: 700;
+      }
+
+      code {
+        font-family: 'SF Mono', 'Fira Code', monospace;
+        font-size: 11.5px;
+        background: var(--gray-100);
+        border-radius: 3px;
+        padding: 1px 5px;
+        color: var(--gray-700);
+      }
+
+      /* ── 푸터 ── */
+      .footer {
+        text-align: center;
+        margin-top: 64px;
+        padding-top: 24px;
+        border-top: 1px solid var(--gray-200);
+        font-size: 12px;
+        color: var(--gray-400);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <!-- 헤더 -->
+      <header class="page-header">
+        <div class="page-badge">📋 Notion Database Schema</div>
+        <h1 class="page-title">Invoice Web Viewer</h1>
+        <p class="page-subtitle">
+          Notion DB를 수동으로 생성할 때 참고하는 스키마 문서입니다.<br />
+          아래 순서대로 DB를 만들고 필드를 추가해 주세요.
+        </p>
+      </header>
+
+      <!-- 관계 다이어그램 -->
+      <div class="relation-diagram">
+        <div class="relation-box db-invoice">
+          <div class="relation-box-icon">📄</div>
+          <div class="relation-box-label">Database 1</div>
+          <div class="relation-box-title">견적서</div>
+          <div class="relation-box-env">NOTION_INVOICE_DB_ID</div>
+        </div>
+        <div class="relation-arrow">
+          <div class="relation-arrow-line"></div>
+          <div class="relation-arrow-label">Relation (1 : N)</div>
+          <div class="relation-arrow-field">항목(Items) ↔ 견적서(Invoice)</div>
+        </div>
+        <div class="relation-box db-item">
+          <div class="relation-box-icon">📦</div>
+          <div class="relation-box-label">Database 2</div>
+          <div class="relation-box-title">견적 항목</div>
+          <div class="relation-box-env">NOTION_ITEM_DB_ID</div>
+        </div>
+      </div>
+
+      <!-- ───────────────── DB 1: 견적서 ───────────────── -->
+      <section class="db-section">
+        <div class="db-header invoice">
+          <div class="db-header-icon">📄</div>
+          <div class="db-header-content">
+            <div class="db-header-tag">Database 1</div>
+            <div class="db-header-title">견적서 (Invoice)</div>
+            <div class="db-header-desc">
+              고객에게 공유하는 견적서 레코드를 저장합니다. UUID 슬러그 기반의
+              공개 URL을 관리합니다.
+            </div>
+            <div class="db-header-env">NOTION_INVOICE_DB_ID</div>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 240px">Notion 필드명</th>
+                <th style="width: 150px">속성 타입</th>
+                <th style="width: 90px">필수</th>
+                <th>설명 / 입력 방법</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- 제목 -->
+              <tr>
+                <td>
+                  <div class="field-name">
+                    <span class="field-notion">제목(Title)</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="type-badge type-title">🔠 Title</span>
+                </td>
+                <td>
+                  <span class="required-badge req-yes">✅ 필수</span>
+                </td>
+                <td>
+                  <div class="field-desc">
+                    견적서 이름 — Notion DB 생성 시 기본 제목 필드 사용
+                  </div>
+                  <div class="field-note">예: 2026-02 웹사이트 리뉴얼 견적</div>
+                </td>
+              </tr>
+              <!-- 견적서 번호 -->
+              <tr>
+                <td>
+                  <span class="field-notion">견적서 번호(Invoice No)</span>
+                </td>
+                <td>
+                  <span class="type-badge type-rich-text">📝 Rich Text</span>
+                </td>
+                <td>
+                  <span class="required-badge req-yes">✅ 필수</span>
+                </td>
+                <td>
+                  <div class="field-desc">사내 견적서 식별 번호</div>
+                  <div class="field-note">예: INV-2026-001</div>
+                </td>
+              </tr>
+              <!-- 클라이언트명 -->
+              <tr>
+                <td>
+                  <span class="field-notion">클라이언트명(Client Name)</span>
+                </td>
+                <td>
+                  <span class="type-badge type-rich-text">📝 Rich Text</span>
+                </td>
+                <td>
+                  <span class="required-badge req-yes">✅ 필수</span>
+                </td>
+                <td>
+                  <div class="field-desc">
+                    견적서를 받는 고객사 또는 담당자명
+                  </div>
+                </td>
+              </tr>
+              <!-- 클라이언트 이메일 -->
+              <tr>
+                <td>
+                  <span class="field-notion"
+                    >클라이언트 이메일(Client Email)</span
+                  >
+                </td>
+                <td>
+                  <span class="type-badge type-email">📧 Email</span>
+                </td>
+                <td>
+                  <span class="required-badge req-no">⬜ 선택</span>
+                </td>
+                <td>
+                  <div class="field-desc">
+                    고객 이메일 (추후 자동 발송 확장용)
+                  </div>
+                </td>
+              </tr>
+              <!-- 발행일 -->
+              <tr>
+                <td>
+                  <span class="field-notion">발행일(Issue Date)</span>
+                </td>
+                <td>
+                  <span class="type-badge type-date">📅 Date</span>
+                </td>
+                <td>
+                  <span class="required-badge req-yes">✅ 필수</span>
+                </td>
+                <td>
+                  <div class="field-desc">견적서 발행 날짜</div>
+                  <div class="field-note">형식: YYYY-MM-DD</div>
+                </td>
+              </tr>
+              <!-- 유효기간 -->
+              <tr>
+                <td>
+                  <span class="field-notion">유효기간(Valid Until)</span>
+                </td>
+                <td>
+                  <span class="type-badge type-date">📅 Date</span>
+                </td>
+                <td>
+                  <span class="required-badge req-yes">✅ 필수</span>
+                </td>
+                <td>
+                  <div class="field-desc">
+                    견적서 만료 날짜 — 이 날짜 이후 고객 접근 차단
+                  </div>
+                  <div class="field-note">형식: YYYY-MM-DD</div>
+                </td>
+              </tr>
+              <!-- 항목 (Relation) -->
+              <tr>
+                <td>
+                  <span class="field-notion">항목(Items)</span>
+                </td>
+                <td>
+                  <span class="type-badge type-relation">🔗 Relation</span>
+                </td>
+                <td>
+                  <span class="required-badge req-yes">✅ 필수</span>
+                </td>
+                <td>
+                  <div class="field-desc">
+                    견적 항목 DB와 연결 — <strong>DB 2(견적 항목)</strong>를
+                    먼저 생성 후 연결
+                  </div>
+                  <div class="field-note">
+                    Relation 설정: 견적 항목 DB → 역참조 필드명
+                    <code>견적서(Invoice)</code>
+                  </div>
+                </td>
+              </tr>
+              <!-- 소계 -->
+              <tr>
+                <td>
+                  <span class="field-notion">소계(Subtotal)</span>
+                </td>
+                <td>
+                  <span class="type-badge type-number">🔢 Number</span>
+                </td>
+                <td>
+                  <span class="required-badge req-yes">✅ 필수</span>
+                </td>
+                <td>
+                  <div class="field-desc">
+                    세금 제외 합계 — Number 타입, 숫자 형식:
+                    <code>원화</code>
+                  </div>
+                  <div class="field-note">
+                    항목 금액을 합산하여 수동 입력 (롤업 사용 시 Formula로
+                    대체 가능)
+                  </div>
+                </td>
+              </tr>
+              <!-- 세율 -->
+              <tr>
+                <td>
+                  <span class="field-notion">세율(Tax Rate %)</span>
+                </td>
+                <td>
+                  <span class="type-badge type-number">🔢 Number</span>
+                </td>
+                <td>
+                  <span class="required-badge req-yes">✅ 필수</span>
+                </td>
+                <td>
+                  <div class="field-desc">
+                    부가세율 — 숫자 형식: <code>숫자</code>
+                  </div>
+                  <div class="field-note">기본값: 10 (10%)</div>
+                </td>
+              </tr>
+              <!-- 세금 -->
+              <tr>
+                <td>
+                  <span class="field-notion">세금(Tax Amount)</span>
+                </td>
+                <td>
+                  <span class="type-badge type-formula">ƒ Formula</span>
+                </td>
+                <td>
+                  <span class="required-badge req-auto">⚙️ 자동</span>
+                </td>
+                <td>
+                  <div class="field-desc">부가세 금액 — Formula 자동 계산</div>
+                  <div class="field-formula">
+                    prop("소계(Subtotal)") * prop("세율(Tax Rate %)") / 100
+                  </div>
+                </td>
+              </tr>
+              <!-- 합계 -->
+              <tr>
+                <td>
+                  <span class="field-notion">합계(Total)</span>
+                </td>
+                <td>
+                  <span class="type-badge type-formula">ƒ Formula</span>
+                </td>
+                <td>
+                  <span class="required-badge req-auto">⚙️ 자동</span>
+                </td>
+                <td>
+                  <div class="field-desc">최종 합계 — Formula 자동 계산</div>
+                  <div class="field-formula">
+                    prop("소계(Subtotal)") + prop("세금(Tax Amount)")
+                  </div>
+                </td>
+              </tr>
+              <!-- 메모 -->
+              <tr>
+                <td>
+                  <span class="field-notion">메모(Notes)</span>
+                </td>
+                <td>
+                  <span class="type-badge type-rich-text">📝 Rich Text</span>
+                </td>
+                <td>
+                  <span class="required-badge req-no">⬜ 선택</span>
+                </td>
+                <td>
+                  <div class="field-desc">고객에게 전달할 특이사항 및 조건</div>
+                </td>
+              </tr>
+              <!-- 공개 슬러그 -->
+              <tr style="background: #fffbeb">
+                <td>
+                  <span class="field-notion">공개 슬러그(Public Slug)</span>
+                </td>
+                <td>
+                  <span class="type-badge type-rich-text">📝 Rich Text</span>
+                </td>
+                <td>
+                  <span class="required-badge req-yes">✅ 필수</span>
+                </td>
+                <td>
+                  <div class="field-desc">
+                    UUID v4 기반 공개 URL 식별자 — 어드민 API로 자동 발급 가능
+                  </div>
+                  <div class="field-note">
+                    형식: <code>xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx</code>
+                    &nbsp;|&nbsp; 예:
+                    <code>a1b2c3d4-e5f6-4789-abcd-ef0123456789</code>
+                  </div>
+                </td>
+              </tr>
+              <!-- 상태 -->
+              <tr style="background: #fef9f0">
+                <td>
+                  <span class="field-notion">상태(Status)</span>
+                </td>
+                <td>
+                  <span class="type-badge type-select">🏷 Select</span>
+                </td>
+                <td>
+                  <span class="required-badge req-yes">✅ 필수</span>
+                </td>
+                <td>
+                  <div class="field-desc">
+                    견적서 현재 상태 — 아래 선택지 4개를 모두 추가하세요
+                  </div>
+                </td>
+              </tr>
+              <!-- 담당자 -->
+              <tr>
+                <td>
+                  <span class="field-notion">담당자(Owner)</span>
+                </td>
+                <td>
+                  <span class="type-badge type-person">👤 Person</span>
+                </td>
+                <td>
+                  <span class="required-badge req-no">⬜ 선택</span>
+                </td>
+                <td>
+                  <div class="field-desc">
+                    견적서 작성 담당자 (Notion 워크스페이스 멤버)
+                  </div>
+                </td>
+              </tr>
+              <!-- 생성일 -->
+              <tr>
+                <td>
+                  <span class="field-notion">생성일(Created At)</span>
+                </td>
+                <td>
+                  <span class="type-badge type-created-time"
+                    >🕐 Created time</span
+                  >
+                </td>
+                <td>
+                  <span class="required-badge req-auto">⚙️ 자동</span>
+                </td>
+                <td>
+                  <div class="field-desc">레코드 자동 생성 시각 — Notion이 자동으로 기록</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 상태 선택지 -->
+        <div class="status-section">
+          <div class="status-section-header">
+            <span>🏷</span>
+            <span class="status-section-title"
+              >상태(Status) Select 옵션 — 아래 4개 옵션을 정확히 입력하세요</span
+            >
+          </div>
+          <div class="status-options">
+            <div class="status-option">
+              <div class="status-top">
+                <div
+                  class="status-dot"
+                  style="background: #94a3b8"
+                ></div>
+                <span class="status-value-ko">초안</span>
+                <span class="status-value-en">Draft</span>
+              </div>
+              <div class="status-desc">작성 중인 견적서</div>
+              <div class="status-access access-no">
+                🚫 고객 접근 차단
+              </div>
+            </div>
+            <div class="status-option">
+              <div class="status-top">
+                <div
+                  class="status-dot"
+                  style="background: #3b82f6"
+                ></div>
+                <span class="status-value-ko">발송</span>
+                <span class="status-value-en">Sent</span>
+              </div>
+              <div class="status-desc">고객에게 링크를 발송한 상태</div>
+              <div class="status-access access-yes">
+                ✅ 고객 열람 가능
+              </div>
+            </div>
+            <div class="status-option">
+              <div class="status-top">
+                <div
+                  class="status-dot"
+                  style="background: #22c55e"
+                ></div>
+                <span class="status-value-ko">승인</span>
+                <span class="status-value-en">Approved</span>
+              </div>
+              <div class="status-desc">고객이 견적서를 승인한 상태</div>
+              <div class="status-access access-yes">
+                ✅ 고객 열람 가능
+              </div>
+            </div>
+            <div class="status-option">
+              <div class="status-top">
+                <div
+                  class="status-dot"
+                  style="background: #ef4444"
+                ></div>
+                <span class="status-value-ko">만료</span>
+                <span class="status-value-en">Expired</span>
+              </div>
+              <div class="status-desc">유효기간이 지난 견적서</div>
+              <div class="status-access access-no">
+                🚫 고객 접근 차단
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+
+      <!-- ───────────────── DB 2: 견적 항목 ───────────────── -->
+      <section class="db-section">
+        <div class="db-header item">
+          <div class="db-header-icon">📦</div>
+          <div class="db-header-content">
+            <div class="db-header-tag">Database 2</div>
+            <div class="db-header-title">견적 항목 (Invoice Item)</div>
+            <div class="db-header-desc">
+              견적서에 포함된 개별 항목(서비스·상품)을 저장합니다. DB 1(견적서)과
+              Relation으로 연결됩니다.
+            </div>
+            <div class="db-header-env">NOTION_ITEM_DB_ID</div>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 240px">Notion 필드명</th>
+                <th style="width: 150px">속성 타입</th>
+                <th style="width: 90px">필수</th>
+                <th>설명 / 입력 방법</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- 항목명 -->
+              <tr>
+                <td>
+                  <span class="field-notion">항목명(Item Name)</span>
+                </td>
+                <td>
+                  <span class="type-badge type-title">🔠 Title</span>
+                </td>
+                <td>
+                  <span class="required-badge req-yes">✅ 필수</span>
+                </td>
+                <td>
+                  <div class="field-desc">
+                    서비스·상품명 — Notion DB 생성 시 기본 제목 필드 사용
+                  </div>
+                  <div class="field-note">예: UI 디자인, 개발 공수, 서버 호스팅</div>
+                </td>
+              </tr>
+              <!-- 설명 -->
+              <tr>
+                <td>
+                  <span class="field-notion">설명(Description)</span>
+                </td>
+                <td>
+                  <span class="type-badge type-rich-text">📝 Rich Text</span>
+                </td>
+                <td>
+                  <span class="required-badge req-no">⬜ 선택</span>
+                </td>
+                <td>
+                  <div class="field-desc">항목 세부 설명</div>
+                </td>
+              </tr>
+              <!-- 수량 -->
+              <tr>
+                <td>
+                  <span class="field-notion">수량(Quantity)</span>
+                </td>
+                <td>
+                  <span class="type-badge type-number">🔢 Number</span>
+                </td>
+                <td>
+                  <span class="required-badge req-yes">✅ 필수</span>
+                </td>
+                <td>
+                  <div class="field-desc">
+                    수량 또는 공수 — 숫자 형식: <code>숫자</code>
+                  </div>
+                  <div class="field-note">예: 1, 3, 0.5 (반일)</div>
+                </td>
+              </tr>
+              <!-- 단위 -->
+              <tr>
+                <td>
+                  <span class="field-notion">단위(Unit)</span>
+                </td>
+                <td>
+                  <span class="type-badge type-select">🏷 Select</span>
+                </td>
+                <td>
+                  <span class="required-badge req-yes">✅ 필수</span>
+                </td>
+                <td>
+                  <div class="field-desc">수량의 단위 — 아래 옵션을 추가하세요</div>
+                  <div class="unit-options">
+                    <span class="unit-chip">개</span>
+                    <span class="unit-chip">일</span>
+                    <span class="unit-chip">시간</span>
+                    <span class="unit-chip">식</span>
+                  </div>
+                </td>
+              </tr>
+              <!-- 단가 -->
+              <tr>
+                <td>
+                  <span class="field-notion">단가(Unit Price)</span>
+                </td>
+                <td>
+                  <span class="type-badge type-number">🔢 Number</span>
+                </td>
+                <td>
+                  <span class="required-badge req-yes">✅ 필수</span>
+                </td>
+                <td>
+                  <div class="field-desc">
+                    단위당 가격 — 숫자 형식: <code>원화</code>
+                  </div>
+                  <div class="field-note">예: 500000 (50만원)</div>
+                </td>
+              </tr>
+              <!-- 금액 -->
+              <tr>
+                <td>
+                  <span class="field-notion">금액(Amount)</span>
+                </td>
+                <td>
+                  <span class="type-badge type-formula">ƒ Formula</span>
+                </td>
+                <td>
+                  <span class="required-badge req-auto">⚙️ 자동</span>
+                </td>
+                <td>
+                  <div class="field-desc">항목 금액 — Formula 자동 계산</div>
+                  <div class="field-formula">
+                    prop("수량(Quantity)") * prop("단가(Unit Price)")
+                  </div>
+                </td>
+              </tr>
+              <!-- 견적서 (역Relation) -->
+              <tr>
+                <td>
+                  <span class="field-notion">견적서(Invoice)</span>
+                </td>
+                <td>
+                  <span class="type-badge type-relation">🔗 Relation</span>
+                </td>
+                <td>
+                  <span class="required-badge req-yes">✅ 필수</span>
+                </td>
+                <td>
+                  <div class="field-desc">
+                    연결된 견적서 DB 레코드 — DB 1(견적서)의
+                    <code>항목(Items)</code> 필드와 양방향 연결
+                  </div>
+                  <div class="field-note">
+                    Notion에서 DB 1의 Relation 필드 생성 시 자동으로 역참조
+                    필드가 생성됩니다
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 체크리스트 -->
+      <section class="checklist-section">
+        <h2 class="checklist-title">✅ Notion DB 생성 순서 체크리스트</h2>
+        <p class="checklist-subtitle">
+          아래 순서를 따라 Notion에서 DB를 생성하세요. DB 2를 먼저 만들어야 Relation 연결이 가능합니다.
+        </p>
+        <div class="checklist-grid">
+          <!-- DB 2 먼저 -->
+          <div class="checklist-card item">
+            <div class="checklist-card-header">
+              <span>📦</span> STEP 1 — 견적 항목 DB 먼저 생성
+            </div>
+            <div class="checklist-items">
+              <div class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span>새 Notion 페이지 → <strong>Database (Full page)</strong> 생성</span>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span>DB 이름: <strong>견적 항목</strong> 입력</span>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span>기본 Title 필드 이름을 <span class="checklist-field">항목명(Item Name)</span>으로 변경</span>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span><span class="checklist-field">설명(Description)</span> — Rich Text 추가</span>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span><span class="checklist-field">수량(Quantity)</span> — Number 추가</span>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span><span class="checklist-field">단위(Unit)</span> — Select 추가 후 개/일/시간/식 옵션 입력</span>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span><span class="checklist-field">단가(Unit Price)</span> — Number 추가, 형식: 원화</span>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span><span class="checklist-field">금액(Amount)</span> — Formula 추가 후 수식 입력</span>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span>DB ID 복사 → <code>.env.local</code>의 <code>NOTION_ITEM_DB_ID</code>에 붙여넣기</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- DB 1 -->
+          <div class="checklist-card invoice">
+            <div class="checklist-card-header">
+              <span>📄</span> STEP 2 — 견적서 DB 생성 (DB 2 완료 후)
+            </div>
+            <div class="checklist-items">
+              <div class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span>새 Notion 페이지 → <strong>Database (Full page)</strong> 생성</span>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span>DB 이름: <strong>견적서</strong> 입력</span>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span>기본 Title 필드 이름을 <span class="checklist-field">제목(Title)</span>으로 변경</span>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span><span class="checklist-field">견적서 번호(Invoice No)</span> — Rich Text 추가</span>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span><span class="checklist-field">클라이언트명(Client Name)</span> — Rich Text 추가</span>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span><span class="checklist-field">클라이언트 이메일(Client Email)</span> — Email 추가</span>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span><span class="checklist-field">발행일(Issue Date)</span> — Date 추가</span>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span><span class="checklist-field">유효기간(Valid Until)</span> — Date 추가</span>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span><span class="checklist-field">항목(Items)</span> — Relation 추가 → 견적 항목 DB 선택 → 역참조 이름 <code>견적서(Invoice)</code></span>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span><span class="checklist-field">소계(Subtotal)</span> — Number 추가, 형식: 원화</span>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span><span class="checklist-field">세율(Tax Rate %)</span> — Number 추가</span>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span><span class="checklist-field">세금(Tax Amount)</span> — Formula 추가 후 수식 입력</span>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span><span class="checklist-field">합계(Total)</span> — Formula 추가 후 수식 입력</span>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span><span class="checklist-field">메모(Notes)</span> — Rich Text 추가</span>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span><span class="checklist-field">공개 슬러그(Public Slug)</span> — Rich Text 추가</span>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span><span class="checklist-field">상태(Status)</span> — Select 추가 → 초안/발송/승인/만료 옵션 입력</span>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span><span class="checklist-field">담당자(Owner)</span> — Person 추가</span>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span><span class="checklist-field">생성일(Created At)</span> — Created time 추가</span>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span>DB ID 복사 → <code>.env.local</code>의 <code>NOTION_INVOICE_DB_ID</code>에 붙여넣기</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 주의사항 -->
+      <div class="notice-box">
+        <div class="notice-title">⚠️ 주의사항 — 반드시 확인하세요</div>
+        <ul class="notice-list">
+          <li>
+            <strong>필드명은 띄어쓰기·괄호까지 정확히 일치</strong>해야 합니다.
+            코드의 <code>getProperty(page, '필드명')</code>이 Notion 필드명과
+            완전히 같아야 데이터를 읽을 수 있습니다.
+          </li>
+          <li>
+            <strong>DB 2(견적 항목)를 먼저 생성</strong>해야 DB 1(견적서)에서
+            Relation 필드를 연결할 수 있습니다.
+          </li>
+          <li>
+            Notion DB ID는 DB 페이지 URL에서 복사합니다:
+            <code>notion.so/workspace/<strong>[DB-ID]</strong>?v=...</code>
+          </li>
+          <li>
+            <strong>상태(Status) 옵션 이름</strong>은 영문 코드값(<code>Draft</code>,
+            <code>Sent</code>, <code>Approved</code>, <code>Expired</code>)과
+            한국어(<code>초안</code>, <code>발송</code>, <code>승인</code>, <code>만료</code>)
+            중 코드에서 <code>statusProp?.select?.name</code>으로 읽어오므로,
+            실제 Select 옵션에 입력한 텍스트 그대로 비교됩니다.
+            현재 코드는 <strong>영문 이름</strong>으로 비교하므로 옵션을 영문(<code>Draft</code> 등)으로 입력하거나
+            코드를 한국어에 맞게 수정하세요.
+          </li>
+          <li>
+            <code>NOTION_API_KEY</code>는 Notion Integration에서 발급하며,
+            해당 Integration을 두 DB 모두에 <strong>공유(Share)</strong>해야
+            데이터 조회가 가능합니다.
+          </li>
+        </ul>
+      </div>
+
+      <footer class="footer">
+        Invoice Web Viewer — Notion DB Schema Reference &nbsp;|&nbsp; v0.1.0
+        &nbsp;|&nbsp; 기반 문서: docs/PRD.md
+      </footer>
+    </div>
+  </body>
+</html>

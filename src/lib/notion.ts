@@ -23,6 +23,24 @@ function extractRichText(
     .join('')
 }
 
+// Notion 상태 값(한글/영어 혼용) → InvoiceStatus 변환
+function mapNotionStatus(statusName: string | undefined): InvoiceStatus {
+  const mapping: Record<string, InvoiceStatus> = {
+    // 영어 값 (PRD 표준)
+    Draft: 'Draft',
+    Sent: 'Sent',
+    Approved: 'Approved',
+    Expired: 'Expired',
+    // 한글 값 (실제 Notion DB)
+    초안: 'Draft',
+    발송: 'Sent',
+    대기: 'Sent', // 검토 대기 중 → Sent
+    승인: 'Approved',
+    만료: 'Expired',
+  }
+  return mapping[statusName ?? ''] ?? 'Draft'
+}
+
 // Notion 페이지에서 특정 프로퍼티 추출 헬퍼
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getProperty(page: PageObjectResponse, name: string): any {
@@ -47,11 +65,12 @@ async function getInvoiceItems(invoicePageId: string): Promise<InvoiceItem[]> {
     .filter((page): page is PageObjectResponse => 'properties' in page)
     .map(page => {
       const nameProp = getProperty(page, '항목명(Item Name)')
-      const descProp = getProperty(page, '설명(Description)')
       const qtyProp = getProperty(page, '수량(Quantity)')
-      const unitProp = getProperty(page, '단위(Unit)')
       const unitPriceProp = getProperty(page, '단가(Unit Price)')
       const amountProp = getProperty(page, '금액(Amount)')
+      // 선택 필드 — Notion DB에 없을 수 있음
+      const descProp = getProperty(page, '설명(Description)')
+      const unitProp = getProperty(page, '단위(Unit)')
 
       const quantity = qtyProp?.number ?? 0
       const unitPrice = unitPriceProp?.number ?? 0
@@ -59,11 +78,16 @@ async function getInvoiceItems(invoicePageId: string): Promise<InvoiceItem[]> {
       return {
         id: page.id,
         name: extractRichText(nameProp?.title ?? []),
-        description: extractRichText(descProp?.rich_text ?? []),
+        description: descProp
+          ? extractRichText(descProp.rich_text ?? []) || undefined
+          : undefined,
         quantity,
-        unit: unitProp?.select?.name ?? '',
+        unit: unitProp?.select?.name ?? undefined,
         unitPrice,
-        amount: amountProp?.formula?.number ?? quantity * unitPrice,
+        amount:
+          amountProp?.number ??
+          amountProp?.formula?.number ??
+          quantity * unitPrice,
       }
     })
 }
@@ -80,35 +104,38 @@ async function notionPageToInvoice(
 
   const fullPage = page as PageObjectResponse
 
-  const statusProp = getProperty(fullPage, '상태(Status)')
-  const invoiceNoProp = getProperty(fullPage, '견적서 번호(Invoice No)')
+  // 실제 Notion DB 필드명 기준으로 조회
+  // Invoice DB: 견적서번호(Title), 클라이언트명(Client Name), 발행일(Issue Date),
+  //             유효기간(Valid Until), 상태(Status), 총금액, 항목(Relation)
+  const titleProp = getProperty(fullPage, '견적서번호') // Title 필드 (INV-XXXX 형식)
   const clientNameProp = getProperty(fullPage, '클라이언트명(Client Name)')
+  const issueDateProp = getProperty(fullPage, '발행일(Issue Date)')
+  const validUntilProp = getProperty(fullPage, '유효기간(Valid Until)')
+  const statusProp = getProperty(fullPage, '상태(Status)')
+  const totalProp = getProperty(fullPage, '총금액') // 합계 Number 필드
+  // 선택 필드 — Notion DB에 없을 수 있음
   const clientEmailProp = getProperty(
     fullPage,
     '클라이언트 이메일(Client Email)'
   )
-  const issueDateProp = getProperty(fullPage, '발행일(Issue Date)')
-  const validUntilProp = getProperty(fullPage, '유효기간(Valid Until)')
-  const subtotalProp = getProperty(fullPage, '소계(Subtotal)')
-  const taxRateProp = getProperty(fullPage, '세율(Tax Rate %)')
-  const taxAmountProp = getProperty(fullPage, '세금(Tax Amount)')
-  const totalProp = getProperty(fullPage, '합계(Total)')
   const notesProp = getProperty(fullPage, '메모(Notes)')
-  const titleProp = getProperty(fullPage, '제목(Title)')
 
-  const subtotal = subtotalProp?.number ?? 0
-  const taxRate = taxRateProp?.number ?? 10
-  const taxAmount =
-    taxAmountProp?.formula?.number ?? Math.round((subtotal * taxRate) / 100)
-  const total = totalProp?.formula?.number ?? subtotal + taxAmount
-
-  // 항목 목록 조회 (별도 DB Relation)
+  // 항목 목록 조회 (별도 DB Relation) — 소계 계산에 필요하므로 먼저 조회
   const items = await getInvoiceItems(fullPage.id)
+
+  // 소계 = 항목 금액 합산 (DB에 별도 필드 없음)
+  const subtotal = items.reduce((sum, item) => sum + item.amount, 0)
+  const taxRate = 10 // 기본 세율 10% (DB에 세율 필드 없음)
+  const taxAmount = Math.round((subtotal * taxRate) / 100)
+  // 총금액은 DB 값 우선, 없으면 소계+세금으로 계산
+  const total = totalProp?.number ?? subtotal + taxAmount
+
+  const invoiceNo = extractRichText(titleProp?.title ?? [])
 
   return {
     id: fullPage.id,
-    title: extractRichText(titleProp?.title ?? []),
-    invoiceNo: extractRichText(invoiceNoProp?.rich_text ?? []),
+    title: invoiceNo, // 견적서번호 필드를 제목으로도 사용
+    invoiceNo,
     clientName: extractRichText(clientNameProp?.rich_text ?? []),
     clientEmail: clientEmailProp?.email ?? undefined,
     issueDate: issueDateProp?.date?.start ?? '',
@@ -121,7 +148,7 @@ async function notionPageToInvoice(
     notes: notesProp
       ? extractRichText(notesProp.rich_text ?? []) || undefined
       : undefined,
-    status: (statusProp?.select?.name ?? 'Draft') as InvoiceStatus,
+    status: mapNotionStatus(statusProp?.select?.name),
     // slug는 반환 타입에 포함하지 않음 (내부 전용)
   }
 }

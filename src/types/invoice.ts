@@ -4,12 +4,12 @@ export type InvoiceStatus = 'Draft' | 'Sent' | 'Approved' | 'Expired'
 // 견적 항목 타입
 export interface InvoiceItem {
   id: string
-  name: string // 항목명
-  description: string // 설명
-  quantity: number // 수량
-  unit: string // 단위 (개, 일, 시간, 식)
-  unitPrice: number // 단가
-  amount: number // 금액 (수량 × 단가)
+  name: string // 항목명(Item Name)
+  description?: string // 설명(Description) — Notion DB 선택 필드
+  quantity: number // 수량(Quantity)
+  unit?: string // 단위(Unit) — Notion DB 선택 필드
+  unitPrice: number // 단가(Unit Price)
+  amount: number // 금액(Amount) = 수량 × 단가
 }
 
 // 견적서 타입
