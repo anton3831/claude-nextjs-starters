@@ -549,14 +549,14 @@
       "id": "59574c3e-2c0d-4a76-94c1-d74959c807b5",
       "name": "5.3 Vercel 배포 및 환경 변수 설정",
       "description": "Next.js 앱을 Vercel에 배포하고 환경 변수 등록.\n\n단계:\n1. npm run build로 로컬 빌드 성공 확인\n2. Vercel 대시보드에서 GitHub 저장소 연동\n3. Settings > Environment Variables에 4개 변수 등록:\n   - NOTION_API_KEY\n   - NOTION_INVOICE_DB_ID\n   - NOTION_ITEM_DB_ID\n   - ADMIN_SECRET\n4. 재배포 트리거 (또는 자동 배포 대기)\n5. 프로덕션 URL에서 /invoice/{sent-slug} 접근 확인",
-      "status": "pending",
+      "status": "completed",
       "dependencies": [
         {
           "taskId": "c0b1ff11-8035-4e54-8242-5408b5544490"
         }
       ],
       "createdAt": "2026-02-22T15:08:37.962Z",
-      "updatedAt": "2026-02-22T15:31:06.956Z",
+      "updatedAt": "2026-02-22T23:46:42.059Z",
       "relatedFiles": [
         {
           "path": "src/lib/env.ts",
@@ -571,20 +571,22 @@
       ],
       "implementationGuide": "1. npm run build -- 빌드 성공 확인\n2. vercel login + vercel link (또는 GitHub Push로 자동 배포)\n3. 환경 변수: Production/Preview/Development 모두 설정\n4. 배포 완료 후 https://{vercel-url}/api/invoice/{slug} 응답 확인",
       "verificationCriteria": "npm run build 성공, Vercel 배포 완료, 프로덕션 URL /invoice/{sent-slug} 200 응답",
-      "analysisResult": "Phase 5 실제 파일 분석 결과 반영: (1) tsconfig.json의 \\\"**/*.ts\\\" include 패턴으로 scripts/setup-notion.ts가 TypeScript 컴파일 대상에 포함되어 타입 오류가 npm run check-all을 차단함 → 5.2a는 빌드 파이프라인 차단 해제 필수 작업. (2) .gitignore가 \\\".env*\\\" 와일드카드 사용 → .env.example도 gitignore 대상 → 5.2b에서 !.env.example 예외 추가 필수. (3) setup-notion.ts는 Sent 1건만 생성 → 5.1 요구사항(3건) 충족을 위해 5.2a에서 Draft/Expired 로직 추가."
+      "analysisResult": "Phase 5 실제 파일 분석 결과 반영: (1) tsconfig.json의 \\\"**/*.ts\\\" include 패턴으로 scripts/setup-notion.ts가 TypeScript 컴파일 대상에 포함되어 타입 오류가 npm run check-all을 차단함 → 5.2a는 빌드 파이프라인 차단 해제 필수 작업. (2) .gitignore가 \\\".env*\\\" 와일드카드 사용 → .env.example도 gitignore 대상 → 5.2b에서 !.env.example 예외 추가 필수. (3) setup-notion.ts는 Sent 1건만 생성 → 5.1 요구사항(3건) 충족을 위해 5.2a에서 Draft/Expired 로직 추가.",
+      "summary": "모든 배포 단계 완료. ① npm run build 성공 (Next.js 15.5.12 업그레이드 포함) ② Vercel 프로젝트 링크 및 환경변수 4개(NOTION_API_KEY, NOTION_INVOICE_DB_ID, NOTION_ITEM_DB_ID, ADMIN_SECRET) production/preview 등록 ③ https://invoice-web-three.vercel.app 프로덕션 배포 완료 ④ /api/invoice/{uuid} 엔드포인트가 Notion API와 정상 연동되어 {\"error\":\"견적서를 찾을 수 없습니다.\"} 응답 확인. 부가 성과: mcp-shrimp-task-manager tsconfig exclude 추가, .vercelignore 생성, CVE-2025-66478 보안 패치 적용.",
+      "completedAt": "2026-02-22T23:46:42.023Z"
     },
     {
       "id": "80d97f69-7225-4c00-8f5a-5ac5045e79bc",
       "name": "5.4 API 엔드포인트 Playwright MCP 검증",
       "description": "Playwright MCP로 모든 API 엔드포인트 E2E 테스트 (개발 서버 localhost:3000 기준).\n\n테스트 케이스 7개:\n1. GET /api/invoice/{valid-sent-slug} → 200 + Invoice JSON\n2. GET /api/invoice/{draft-slug} → 404\n3. GET /api/invoice/{expired-slug} → 404\n4. GET /api/invoice/{잘못된-UUID형식} → 400/404\n5. POST /api/admin/invoice/{slug}/regenerate + x-admin-secret 올바름 → 200 + { newSlug }\n6. POST /api/admin/invoice/{slug}/regenerate + x-admin-secret 잘못됨 → 401\n7. POST /api/revalidate → 200 + { revalidated: true }\n\n전제: npm run dev 실행 중, .env.local 설정 완료, 샘플 3건 존재",
-      "status": "pending",
+      "status": "completed",
       "dependencies": [
         {
           "taskId": "c0b1ff11-8035-4e54-8242-5408b5544490"
         }
       ],
       "createdAt": "2026-02-22T15:08:37.962Z",
-      "updatedAt": "2026-02-22T15:31:06.956Z",
+      "updatedAt": "2026-02-23T00:10:20.991Z",
       "relatedFiles": [
         {
           "path": "src/app/api/invoice/[slug]/route.ts",
@@ -604,20 +606,22 @@
       ],
       "implementationGuide": "1. npm run dev 확인\n2. Playwright MCP browser_navigate로 각 API URL 접속\n3. browser_evaluate로 응답 상태 코드 및 JSON 본문 확인\n4. POST 요청은 browser_run_code로 fetch() 호출\n5. 테스트 케이스별 결과를 순서대로 기록",
       "verificationCriteria": "7개 테스트 케이스 모두 예상 응답(상태 코드+본문) 일치",
-      "analysisResult": "Phase 5 실제 파일 분석 결과 반영: (1) tsconfig.json의 \\\"**/*.ts\\\" include 패턴으로 scripts/setup-notion.ts가 TypeScript 컴파일 대상에 포함되어 타입 오류가 npm run check-all을 차단함 → 5.2a는 빌드 파이프라인 차단 해제 필수 작업. (2) .gitignore가 \\\".env*\\\" 와일드카드 사용 → .env.example도 gitignore 대상 → 5.2b에서 !.env.example 예외 추가 필수. (3) setup-notion.ts는 Sent 1건만 생성 → 5.1 요구사항(3건) 충족을 위해 5.2a에서 Draft/Expired 로직 추가."
+      "analysisResult": "Phase 5 실제 파일 분석 결과 반영: (1) tsconfig.json의 \\\"**/*.ts\\\" include 패턴으로 scripts/setup-notion.ts가 TypeScript 컴파일 대상에 포함되어 타입 오류가 npm run check-all을 차단함 → 5.2a는 빌드 파이프라인 차단 해제 필수 작업. (2) .gitignore가 \\\".env*\\\" 와일드카드 사용 → .env.example도 gitignore 대상 → 5.2b에서 !.env.example 예외 추가 필수. (3) setup-notion.ts는 Sent 1건만 생성 → 5.1 요구사항(3건) 충족을 위해 5.2a에서 Draft/Expired 로직 추가.",
+      "summary": "7개 API 테스트 케이스 모두 통과. (1) GET /sent-slug → 200+Invoice JSON ✅ (2) GET /draft-slug → 404 ✅ (3) GET /expired-slug → 404 ✅ (4) GET /invalid-uuid → 400 ✅ (5) POST regenerate 올바른 secret → 200+newSlug ✅ (6) POST regenerate 잘못된 secret → 401 ✅ (7) POST /api/revalidate → 200+revalidated ✅. /api/revalidate도 x-admin-secret 인증을 요구함을 추가 확인.",
+      "completedAt": "2026-02-23T00:10:20.983Z"
     },
     {
       "id": "1ef7dcda-ed2c-476b-83b2-559f9eeea95f",
       "name": "5.5 뷰어 UI Playwright MCP E2E 테스트",
       "description": "Playwright MCP로 견적서 뷰어 UI E2E 테스트.\n\n테스트 케이스 6개:\n1. /invoice/{sent-slug} → InvoiceHeader/ItemTable/Summary/Meta 렌더링 확인\n2. /invoice/{draft-slug} → '아직 발송되지 않은 견적서입니다' 화면\n3. /invoice/{expired-slug} → '유효기간이 만료된 견적서입니다' 화면\n4. /invoice/{invalid-uuid} → not-found 화면(견적서를 찾을 수 없습니다)\n5. PDF 버튼 클릭 → /invoice/{slug}/print 이동 확인\n6. 375px 모바일 뷰포트 → 레이아웃 깨짐 없음 확인",
-      "status": "pending",
+      "status": "in_progress",
       "dependencies": [
         {
           "taskId": "80d97f69-7225-4c00-8f5a-5ac5045e79bc"
         }
       ],
       "createdAt": "2026-02-22T15:08:37.962Z",
-      "updatedAt": "2026-02-22T15:31:06.956Z",
+      "updatedAt": "2026-02-23T00:18:54.100Z",
       "relatedFiles": [
         {
           "path": "src/app/invoice/[slug]/page.tsx",
