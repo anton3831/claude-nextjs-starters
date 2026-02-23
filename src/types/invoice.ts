@@ -30,6 +30,19 @@ export interface Invoice {
   status: InvoiceStatus // 상태
 }
 
+// 견적서 목록 조회용 경량 타입 (items 제외, slug 포함 — N+1 해결)
+export interface InvoiceListItem {
+  id: string
+  title: string
+  invoiceNo: string
+  clientName: string
+  issueDate: string
+  validUntil: string
+  total: number
+  status: InvoiceStatus
+  slug: string
+}
+
 // API 응답 타입
 export interface InvoiceResponse {
   data: Invoice

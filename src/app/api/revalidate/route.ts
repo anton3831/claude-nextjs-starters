@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 
 export async function POST(request: NextRequest) {
   // x-admin-secret 헤더로 어드민 인증
@@ -21,7 +21,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ revalidated: true, slug })
   }
 
-  // slug 없으면 모든 견적서 경로 무효화
+  // slug 없으면 모든 견적서 경로 + 목록 캐시 무효화
   revalidatePath('/invoice/[slug]', 'page')
+  revalidateTag('invoices') // getAllInvoices() 캐시 무효화
   return NextResponse.json({ revalidated: true })
 }

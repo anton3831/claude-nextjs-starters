@@ -5,7 +5,13 @@ import type {
   PartialDataSourceObjectResponse,
   DataSourceObjectResponse,
 } from '@notionhq/client/build/src/api-endpoints'
-import type { Invoice, InvoiceItem, InvoiceStatus } from '@/types/invoice'
+import type {
+  Invoice,
+  InvoiceItem,
+  InvoiceListItem,
+  InvoiceStatus,
+} from '@/types/invoice'
+import { unstable_cache } from 'next/cache'
 
 // Notion 클라이언트 초기화 (서버 사이드 전용)
 const notion = new Client({
@@ -178,6 +184,59 @@ export async function getInvoiceBySlug(slug: string): Promise<Invoice | null> {
     return null
   }
 }
+
+// Notion 페이지를 InvoiceListItem 타입으로 변환 (항목 조회 없음)
+function notionPageToInvoiceListItem(
+  page: PageObjectResponse
+): InvoiceListItem | null {
+  const titleProp = getProperty(page, '견적서번호')
+  const clientNameProp = getProperty(page, '클라이언트명(Client Name)')
+  const issueDateProp = getProperty(page, '발행일(Issue Date)')
+  const validUntilProp = getProperty(page, '유효기간(Valid Until)')
+  const statusProp = getProperty(page, '상태(Status)')
+  const totalProp = getProperty(page, '총금액')
+  const slugProp = getProperty(page, '공개 슬러그(Public Slug)')
+
+  const invoiceNo = extractRichText(titleProp?.title ?? [])
+  const slug = extractRichText(slugProp?.rich_text ?? [])
+
+  if (!invoiceNo) return null
+
+  return {
+    id: page.id,
+    title: invoiceNo,
+    invoiceNo,
+    clientName: extractRichText(clientNameProp?.rich_text ?? []),
+    issueDate: issueDateProp?.date?.start ?? '',
+    validUntil: validUntilProp?.date?.start ?? '',
+    total: totalProp?.number ?? 0,
+    status: mapNotionStatus(statusProp?.select?.name),
+    slug,
+  }
+}
+
+// 견적서 전체 목록 조회 내부 함수 (1회 API 호출, N+1 없음)
+async function fetchAllInvoices(): Promise<InvoiceListItem[]> {
+  const response = await notion.dataSources.query({
+    data_source_id: process.env.NOTION_INVOICE_DB_ID!,
+    page_size: 100,
+  })
+
+  return response.results
+    .filter((page): page is PageObjectResponse => 'properties' in page)
+    .map(page => notionPageToInvoiceListItem(page))
+    .filter((item): item is InvoiceListItem => item !== null)
+}
+
+// 견적서 전체 목록 조회 (120s 캐시, 'invoices' 태그로 무효화 가능)
+export const getAllInvoices = unstable_cache(
+  fetchAllInvoices,
+  ['all-invoices'],
+  {
+    revalidate: 120,
+    tags: ['invoices'],
+  }
+)
 
 // 견적서 슬러그를 새 UUID로 교체
 export async function regenerateInvoiceSlug(

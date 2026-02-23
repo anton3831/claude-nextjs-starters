@@ -7,7 +7,7 @@ const UUID_REGEX =
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // /invoice/[slug] 또는 /invoice/[slug]/print 경로만 처리
+  // /invoice/[slug] 또는 /invoice/[slug]/print 경로 — UUID 형식 검증
   const invoiceMatch = pathname.match(/^\/invoice\/([^/]+)(\/print)?$/)
 
   if (invoiceMatch) {
@@ -19,10 +19,22 @@ export function middleware(request: NextRequest) {
     }
   }
 
+  // /admin/* 경로 — 로그인 페이지 제외하고 쿠키 인증 검증
+  const isAdminPath = pathname.startsWith('/admin')
+  const isLoginPage = pathname.startsWith('/admin/login')
+
+  if (isAdminPath && !isLoginPage) {
+    const session = request.cookies.get('admin-session')
+
+    if (!session || session.value !== process.env.ADMIN_SECRET) {
+      return NextResponse.redirect(new URL('/admin/login', request.url))
+    }
+  }
+
   return NextResponse.next()
 }
 
 export const config = {
-  // 미들웨어 적용 경로: /invoice/* 하위 경로
-  matcher: ['/invoice/:path*'],
+  // 미들웨어 적용 경로: /invoice/* + /admin/* 하위 경로
+  matcher: ['/invoice/:path*', '/admin/:path*'],
 }
